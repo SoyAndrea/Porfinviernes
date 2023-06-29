@@ -13,8 +13,11 @@
 # (Siempre es bueno verificar en un Hoja de cálculo de excel como este link)
 # https://docs.google.com/spreadsheets/d/1WqLNuOCriRdXaND7xF3OZL939WaaJl_Iy-kzc6jmoOo/edit?usp=sharing
 
-
+# Paquetes
 library(tidyverse)
+library(ggrepel) # para evitar solapamiento de etiquetas
+
+# Datos de prueba
 dat <- tibble::tribble(
   ~trt, ~rep, ~rinde_cosecha, ~humedad_a_cosecha, ~aceite_porc,
   1,    1,           3011,                9.1,         53.2,
@@ -30,10 +33,10 @@ dat <- tibble::tribble(
 # funcion para ajustar rinde por humedad
 
 ajustar_por_humedad <- function(rinde_cosecha, humedad_a_cosecha, hum_recibo){
-  agua = rinde_cosecha*humedad_a_cosecha/100
-  rinde_seco = rinde_cosecha - agua 
-  factor_ajuste = 1-hum_recibo/100
-  rinde_aj_comercial = rinde_seco/factor_ajuste
+  agua <- rinde_cosecha*humedad_a_cosecha/100
+  rinde_seco <- rinde_cosecha - agua 
+  factor_ajuste <- 1-hum_recibo/100
+  rinde_aj_comercial <- rinde_seco/factor_ajuste
 }
 
 # poniendo a prueba la funcion 
@@ -43,24 +46,21 @@ dat %>%
 # funcion para ajustar rinde por binificacion 
 
 ajustar_por_aceite <- function(rinde_aj_humedad, aceite_porcen){
-  bonificacion = 1+((aceite_porcen-42)*2)/100
-  rinde_bonificado = rinde_aj_humedad * bonificacion
+  bonificacion <- 1+((aceite_porcen-42)*2)/100
+  rinde_bonificado <- rinde_aj_humedad * bonificacion
 }
 
-#
+# Actualizando el set de datos
 dat <- dat %>% 
   mutate(rinde_aj_humedad = ajustar_por_humedad(rinde_cosecha, humedad_a_cosecha, hum_recibo=11),
          rinde_bonificado = ajustar_por_aceite(rinde_aj_humedad, aceite_porc))
 
-
+# Graficos!!!
 dat %>%
+  pivot_longer(starts_with("rinde")) %>% 
   ggplot() + 
-  aes(x=trt, group=factor(rep), linetype=factor(rep)) + 
-  stat_summary(fun=mean, aes(y = rinde_aj_humedad, label=round(after_stat(y))), geom="text", size=3) + 
-  stat_summary(fun=mean, aes(y = rinde_aj_humedad, color="rinde_aj_humedad"), geom="line") + 
-  stat_summary(fun=mean, aes(y = rinde_bonificado, label=round(after_stat(y))), geom="text", size=3)  + 
-  stat_summary(fun=mean, aes(y = rinde_bonificado, color="rinde_bonificado"), geom="line") +
-  scale_color_manual(name='Tipo ajuste',
-                     breaks=c("rinde_aj_humedad", "rinde_bonificado"),
-                     values=c('rinde_aj_humedad'='blue', 'rinde_bonificado'='red')) + 
-  labs(linetype="Rep")
+  aes(x=trt, group=interaction(rep, name), linetype=factor(rep), y = value, color = name) +
+  geom_point() + 
+  geom_line(stat = "summary", fun = mean) +
+  geom_text_repel(aes(label = after_stat(y) %>% round()), show.legend = F, size=3) +
+  labs(linetype="Rep", color = "Rinde")
