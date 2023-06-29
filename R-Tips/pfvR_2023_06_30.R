@@ -1,12 +1,15 @@
 
 # Cada cultivo de grano tiene su humedad standard de recibo, por ej. el girasol se recibe a 11% de humedad.
-# Ademas, el girasol puede obtener bonificaciones por el contenido de aceite de los granos, 
+# Ademas, el girasol puede obtener bonificaciones por el contenido de aceite, 
 # esto es: para valores superiores a 42% se bonifica a razón de 2% mas de rendimiento por cada punto %.
 # http://www.agro.unc.edu.ar/~wpweb/cereales/wp-content/uploads/sites/31/2018/07/TABLA-TIPIFICACION-Calidad-Comercial-de-granos.pdf
+
 # Al presentar resultados de ensayos de girasol es común ver el rendimiento ajustado a 11% y sobre este, 
 # se aplica la bonificación correspondiente según % de aceite. 
-# Al tratarse de un cálculo de rutina, nos conviene tener a mano funciones que nos faciliten los cálculos en algun script.
-# Veamos como hariamos esas funciones
+
+# Al tratarse de un cálculo de rutina, nos conviene tener a mano funciones que nos faciliten los cálculos 
+# en algun script. Veamos como hariamos esas funciones
+
 # (Siempre es bueno verificar en un Hoja de cálculo de excel como este link)
 # https://docs.google.com/spreadsheets/d/1WqLNuOCriRdXaND7xF3OZL939WaaJl_Iy-kzc6jmoOo/edit?usp=sharing
 
@@ -24,32 +27,31 @@ dat <- tibble::tribble(
   1,    2,           3001,               10.8,         53.2
 )
 
+# funcion para ajustar rinde por humedad
 
 ajustar_por_humedad <- function(rinde_cosecha, humedad_a_cosecha, hum_recibo){
   agua = rinde_cosecha*humedad_a_cosecha/100
   rinde_seco = rinde_cosecha - agua 
-  rinde_aj_comercial = rinde_seco/(1-hum_recibo/100)
-  print(rinde_aj_comercial)
+  factor_ajuste = 1-hum_recibo/100
+  rinde_aj_comercial = rinde_seco/factor_ajuste
 }
 
+# poniendo a prueba la funcion 
 dat %>% 
   mutate(rinde_aj_humedad = ajustar_por_humedad(rinde_cosecha, humedad_a_cosecha, hum_recibo=11))
+
+# funcion para ajustar rinde por binificacion 
 
 ajustar_por_aceite <- function(rinde_aj_humedad, aceite_porcen){
   bonificacion = 1+((aceite_porcen-42)*2)/100
   rinde_bonificado = rinde_aj_humedad * bonificacion
-  print(rinde_bonificado)
 }
 
+#
 dat <- dat %>% 
   mutate(rinde_aj_humedad = ajustar_por_humedad(rinde_cosecha, humedad_a_cosecha, hum_recibo=11),
          rinde_bonificado = ajustar_por_aceite(rinde_aj_humedad, aceite_porc))
-dat %>%
- ggplot() + 
-  aes(x =trt, y = rinde_aj_humedad, group=factor(rep), col=factor(rep)) + 
-  geom_point() + 
-  geom_line() + 
-  stat_summary(fun=mean, aes(label=round(after_stat(y))), geom="text", size=3, vjust=-.5) 
+
 
 dat %>%
   ggplot() + 
