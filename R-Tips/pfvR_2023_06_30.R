@@ -64,3 +64,9 @@ dat %>%
   geom_line(stat = "summary", fun = mean) +
   geom_text_repel(aes(label = after_stat(y) %>% round()), show.legend = F, size=3) +
   labs(linetype="Rep", color = "Rinde")
+
+# Una forma práctica de disponibilizar funciones es mediante source(script_con_funciones.R), y este puede 
+# estar alojado en nuestras propias PCs o bien en algun repositorio online como en este caso. Para eso 
+# necesitamos tener instalado el paquete "devtools"
+
+devtools::source_url("https://raw.githubusercontent.com/SoyAndrea/Porfinviernes/main/R-Tips/rinde_ajustado.R")
