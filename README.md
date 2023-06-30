@@ -23,7 +23,7 @@ Viernes 7 de julio - 9 AM
 
 **Natalia Gattinoni**
 
-Licenciada en Cs. de la Atmósfera recibida de Fac.. de Cs. Exactas y Naturales de la UBA. Con una beca INTA obtuvo la maestría en RRNN de la EPG-FAUBA. Trabaja en el área de agrometeorología del Inst. de Clima y Agua de INTA y es profesora de climatología para ingenieros agrónomos y de cursos de posgrado.
+Licenciada en Cs. de la Atmósfera recibida de Fac. de Cs. Exactas y Naturales de la UBA. Con una beca INTA obtuvo la maestría en RRNN de la EPG-FAUBA. Trabaja en el área de agrometeorología del Inst. de Clima y Agua de INTA y es profesora de climatología para ingenieros agrónomos y de cursos de posgrado.
 
 
 
