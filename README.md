@@ -1,5 +1,11 @@
-# Por fin vieRnes
+# Por fin vieRnes!
+
 Ciclo de webinars sobre uso de R en agronomía
+
+Formulario de Inscripción al ciclo (por única vez para todo el ciclo)  [form](https://forms.gle/9YjHBWdDdfneTEMA8)
+
+[Canal de youtube de webinars anteriores](https://www.youtube.com/playlist?list=PLUa2kfhXYC3Q4t_RcqeIFKxTDXfhtacPN) 
+
 ---
 ## 1 - Git & GitHub para proyectos colaborativos en R 
 
@@ -16,6 +22,9 @@ _Este repositorio es parte del taller como ejercicio práctico en vivo, todas la
 Viernes 7 de julio - 9 AM
 
 **Natalia Gattinoni**
+
 Licenciada en Cs. de la Atmósfera recibida de Fac.. de Cs. Exactas y Naturales de la UBA. Con una beca INTA obtuvo la maestría en RRNN de la EPG-FAUBA. Trabaja en el área de agrometeorología del Inst. de Clima y Agua de INTA y es profesora de climatología para ingenieros agrónomos y de cursos de posgrado.
+
+
 
  
