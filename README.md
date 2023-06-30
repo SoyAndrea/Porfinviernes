@@ -2,7 +2,7 @@
 
 Ciclo de webinars sobre uso de R en agronomía
 
-Para unirse al ciclo, complete por única vez este [Formulario de Inscripción](https://forms.gle/9YjHBWdDdfneTEMA8)
+Para unirse al ciclo, complete por única vez este [formulario de Inscripción](https://forms.gle/9YjHBWdDdfneTEMA8)
 
 [Canal de youtube de webinars anteriores](https://www.youtube.com/playlist?list=PLUa2kfhXYC3Q4t_RcqeIFKxTDXfhtacPN) 
 
