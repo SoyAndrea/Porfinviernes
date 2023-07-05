@@ -1,12 +1,17 @@
 # Porfinviernes
 Ciclo de webinars sobre uso de R en agronomía
 
-Todos los webinars quedarán disponibles en: https://www.youtube.com/playlist?list=PLUa2kfhXYC3Q4t_RcqeIFKxTDXfhtacPN 
+Todos los webinars quedarán disponibles en: 
+-  [Webinars](https://www.youtube.com/playlist?list=PLUa2kfhXYC3Q4t_RcqeIFKxTDXfhtacPN) 
 
 Coordinamos estos ciclos:
-Juan Edwards (INTA Balcarce)
-Natalia Gattinoni (INTA Castelar)
-Agustín Alesso (Univ. Nac. Litoral)
+
+- Juan Edwards (INTA Balcarce) - 
+
+- Natalia Gattinoni (INTA Castelar) - 
+
+- Agustín Alesso (Univ. Nac. Litoral) -
+
 
 
 ## Webinar 1: Git & GitHub para proyectos colaborativos en R por Andrea Gomez Vargas
