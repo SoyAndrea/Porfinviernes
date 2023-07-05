@@ -1,7 +1,7 @@
 # Porfinviernes
 Ciclo de webinars sobre uso de R en agronomía
 
-Todos los webinar quedarán disponible en: https://www.youtube.com/playlist?list=PLUa2kfhXYC3Q4t_RcqeIFKxTDXfhtacPN 
+Todos los webinars quedarán disponibles en: https://www.youtube.com/playlist?list=PLUa2kfhXYC3Q4t_RcqeIFKxTDXfhtacPN 
 
 Coordinamos estos ciclos:
 Juan Edwards (INTA Balcarce)
