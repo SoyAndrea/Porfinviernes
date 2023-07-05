@@ -9,4 +9,4 @@ _Este repositorio es parte del taller como ejercicio práctico en vivo, todas la
 
 <img src='https://soyandrea.netlify.app/publication/renagro/featured_hu804c6be0e60879cdae4ec787ac45fbf5_220403_720x0_resize_lanczos_2.png' width="500" height="300">
 
-## Webinar 2: 
+## Webinar 2: {agromet}: un paquete para el análisis de datos meteorológicos
