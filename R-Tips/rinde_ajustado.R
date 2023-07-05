@@ -17,3 +17,5 @@ ajustar_por_aceite <- function(rinde_aj_humedad, aceite_porcen){
 
 # poniendo a prueba la funcion 
 # print(ajustar_por_aceite(3033.708, 45))
+
+
