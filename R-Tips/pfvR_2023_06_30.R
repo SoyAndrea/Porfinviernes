@@ -43,7 +43,9 @@ ajustar_por_humedad <- function(rinde_cosecha, humedad_a_cosecha, hum_recibo){
 dat %>% 
   mutate(rinde_aj_humedad = ajustar_por_humedad(rinde_cosecha, humedad_a_cosecha, hum_recibo=11))
 
-# funcion para ajustar rinde por binificacion 
+
+
+# funcion para ajustar rinde por bonificacion 
 
 ajustar_por_aceite <- function(rinde_aj_humedad, aceite_porcen){
   bonificacion <- 1+((aceite_porcen-42)*2)/100
@@ -55,7 +57,8 @@ dat <- dat %>%
   mutate(rinde_aj_humedad = ajustar_por_humedad(rinde_cosecha, humedad_a_cosecha, hum_recibo=11),
          rinde_bonificado = ajustar_por_aceite(rinde_aj_humedad, aceite_porc))
 
-# Graficos!!!
+
+# Grafico!!!
 dat %>%
   pivot_longer(starts_with("rinde")) %>% 
   ggplot() + 
@@ -69,4 +72,4 @@ dat %>%
 # estar alojado en nuestras propias PCs o bien en algun repositorio online como en este caso. Para eso 
 # necesitamos tener instalado el paquete "devtools"
 
-devtools::source_url("https://raw.githubusercontent.com/SoyAndrea/Porfinviernes/main/R-Tips/rinde_ajustado.R")
+devtools::source_url("https://github.com/RenINTA/Porfinviernes/blob/main/R-Tips/rinde_ajustado.R")

@@ -1,8 +1,11 @@
+
+
 # En este ejemplo ubicaremos los puntos de interes del viernes pasado en un mapa de Argentina
 
 # Packages ----
 # install.packages("pacman")
 pacman::p_load(tidyverse,  mapview, sf, geodata, here)
+
 
 # Puntos de interés ----
 puntos <- 

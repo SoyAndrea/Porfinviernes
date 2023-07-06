@@ -1,9 +1,13 @@
+
 # En este ejemplo aprenderermos a obtener informacion de propiedades edaficas 
-# de soil data base, de cualquier punto georefenciado
+# de soil data base, de cualquier punto georeferenciado
 
 # Packages ----
 # install.packages("pacman")
 library(pacman)
+
+#p_load: esta función (dentro de pacman) verifica si está instalado los paquetes, 
+#sino intenta instalarlos y si ya están disponibles sirve como la función library()
 p_load(tidyverse,  soilDB, aqp)
 
 # Puntos de interés ----

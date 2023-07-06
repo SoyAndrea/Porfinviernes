@@ -1,3 +1,12 @@
+
+#script con el conjunto de funciones a utilizar 
+
+# Una forma práctica de disponibilizar funciones es mediante source(script_con_funciones.R), y este puede 
+# estar alojado en nuestras propias PCs o bien en algun repositorio online como en este caso. Para eso 
+# necesitamos tener instalado el paquete "devtools"
+#devtools::source_url("https://github.com/RenINTA/Porfinviernes/blob/main/R-Tips/rinde_ajustado.R")
+#en este caso el script_con_funciones.R es rinde_ajustado.R
+
 ajustar_por_humedad <- function(rinde_cosecha, humedad_a_cosecha, hum_recibo){
   agua <- rinde_cosecha*humedad_a_cosecha/100
   rinde_seco <- rinde_cosecha - agua 
