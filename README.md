@@ -30,9 +30,9 @@ _Natalia es licenciada en Cs. de la Atmósfera recibida de Fac.. de Cs. Exactas 
 
 Les dejamos la presentación:
 
-- [Slides](https://github.com/SoyAndrea/Porfinviernes/blob/main/Paquete%20agromet%20-%207%20de%20julio/07.07.2023%20Paquete%20agromet%20.pdf)
+- [Slides](https://github.com/RenINTA/Porfinviernes/blob/main/Paquete%20agromet%20-%207%20de%20julio/07.07.2023%20Paquete%20agromet.pdf)
 
 
 #les dejamos un resumen de lo visto hasta ahora y al final una encuesta para que nos envíen sus propuestas de futuros temas. gracias!!!
-- [Encuesta](https://github.com/SoyAndrea/Porfinviernes/blob/main/Paquete%20agromet%20-%207%20de%20julio/INTRO%20encuesta%20.pdf)
+- [Encuesta](https://github.com/RenINTA/Porfinviernes/blob/main/Paquete%20agromet%20-%207%20de%20julio/INTRO%20encuesta.pdf)
 
