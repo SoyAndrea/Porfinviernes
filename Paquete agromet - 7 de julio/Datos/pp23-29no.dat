@@ -1,0 +1,110 @@
+LONGITUD LATITUD ARCHIVO PROMEDIO DIAS NOMBRE
+ -59.83  -36.75 NH0196.DAT    29.2   7 AZUL-AERO                       
+ -62.17  -38.73 NH0221.DAT     0.0   7 Bahia Blanca- SMN               
+ -71.17  -41.15 NH0323.DAT     5.0   7 Bariloche- SMN                  
+ -59.78  -37.72 NH0008.DAT    18.0   6 Benito Juarez- SMN              
+ -61.10  -36.25 NH0189.DAT    32.0   7 Bolivar- SMN                    
+ -65.77  -28.60 NH0044.DAT    44.0   7 Catamarca- SMN                  
+ -61.95  -29.88 NH0081.DAT    22.0   7 Ceres- SMN                      
+ -67.97  -38.95 NH0163.DAT     0.0   7 Cipolleti - SMN                 
+ -67.50  -45.78 NH0270.DAT     0.0   7 Comodoro Rivadavia- SMN         
+ -58.02  -31.30 NH0477.DAT    70.0   7 Concordia- SMN                  
+ -64.22  -31.32 NH0100.DAT    51.6   7 Cordoba- SMN                    
+ -61.95  -37.50 NH0204.DAT    33.0   7 Coronel Suarez- SMN             
+ -61.33  -38.02 NH0390.DAT    71.5   7 Coronel Pringles -SMN           
+ -58.82  -27.47 NH0470.DAT    93.0   7 Corrientes- SMN                 
+ -66.28  -30.37 NH0476.DAT     0.0   7 Chamical - SMN                  
+ -71.13  -40.08 NH0525.DAT     2.2   7 Chapelco - SMN                  
+ -66.60  -31.33 NH0102.DAT    16.0   7 Chepes - SMN                    
+ -67.50  -29.17 NH0031.DAT     0.0   7 Chilecito - SMN                 
+ -57.73  -36.35 NH0190.DAT    16.2   7 Dolores - SMN                   
+ -71.52  -41.97 NH0158.DAT    11.5   7 El Bolson - SMN                 
+ -72.05  -50.27 NH0571.DAT     0.0   7 El Calafate - SMN               
+ -58.60  -34.60 NH0159.DAT    53.0   7 El Palomar - SMN                
+ -71.35  -42.90 NH0303.DAT     8.9   7 Esquel - SMN                    
+ -58.53  -34.82 NH0166.DAT    34.0   7 Ezeiza - SMN                    
+ -58.23  -26.20 NH0483.DAT   102.0   7 Formosa - SMN                   
+ -63.75  -35.70 NH0334.DAT    25.5   7 General Pico - SMN              
+ -70.17  -48.78 NH0283.DAT     0.0   7 Gobernador Gregores - SMN       
+ -58.52  -33.02 NH0134.DAT    52.0   7 Gualeguaychu - SMN              
+ -54.47  -25.73 NH0353.DAT    21.0   7 Iguazu- SMN                     
+ -65.08  -24.38 NH0500.DAT    18.1   7 Jujuy- SMN                      
+ -65.18  -24.17 NH0543.DAT    23.1   7 Jujuy U N                       
+ -60.92  -34.55 NH0453.DAT    38.0   7 Junin - SMN                     
+ -63.37  -34.13 NH0148.DAT    32.0   7 Laboulaye- SMN                  
+ -57.90  -34.97 NH0450.DAT    43.2   7 La Plata - SMN                  
+ -65.60  -22.10 NH0001.DAT    11.6   7 La Quiaca - SMN                 
+ -66.82  -29.38 NH0077.DAT    22.0   7 La Rioja - SMN                  
+ -59.10  -36.03 NH0186.DAT    12.4   7 Las Flores - SMN                
+ -60.58  -24.70 NH0011.DAT    44.0   7 Las Lomitas- SMN                
+ -69.58  -35.50 NH0179.DAT     2.0   7 Malargue - SMN                  
+ -68.73  -41.25 NH0248.DAT     0.6   7 Maquinchao - SMN                
+ -62.15  -32.70 NH0369.DAT    31.0   7 Marcos Juarez -SMN              
+ -58.49  -34.33 NH0524.DAT    58.0   7 Mariano Moreno-BS AS            
+ -57.58  -37.93 NH0210.DAT     8.0   7 Mar del Plata- SMN              
+ -68.78  -32.83 NH0131.DAT     0.0   7 Mendoza- SMN                    
+ -68.85  -32.88 NH0132.DAT     0.0   7 Mendoza-OBS                     
+ -58.44  -34.41 NH0165.DAT    50.0   7 Merlo-BS AS                     
+ -64.80  -25.48 NH0021.DAT    52.4   7 Metan - SMN                     
+ -57.65  -30.27 NH0087.DAT   127.0   7 Monte Caseros- SMN              
+ -58.63  -34.67 NH0164.DAT    51.0   7 Moron - SMN                     
+ -68.13  -38.95 NH0227.DAT     0.0   7 Neuquen - SMN                   
+ -60.88  -35.45 NH0178.DAT    18.0   7 Nueve de Julio- SMN             
+ -55.13  -27.48 NH0057.DAT   110.0   6 Obera- SMN                      
+ -60.22  -36.88 NH0531.DAT    26.0   7 Olavarria- SMN                  
+ -64.32  -23.15 NH0339.DAT    50.1   7 Oran- SMN                       
+ -60.48  -31.78 NH0113.DAT    50.0   7 Parana- SMN                     
+ -68.88  -43.82 NH0307.DAT     0.8   7 Paso de Indios - SMN            
+ -57.15  -29.68 NH0346.DAT    81.0   7 Paso de los Libres- SMN         
+ -61.90  -35.87 NH0456.DAT    22.0   7 Pehuajo- SMN                    
+ -71.02  -46.52 NH0272.DAT     0.0   7 Perito Moreno - SMN             
+ -62.38  -37.60 NH0206.DAT    61.0   7 Pigue- SMN                      
+ -63.88  -31.67 NH0111.DAT    15.0   7 Pilar- SMN                      
+ -55.97  -27.37 NH0362.DAT    45.0   7 Posadas- SMN                    
+ -65.92  -47.73 NH0280.DAT     2.1   7 Puerto Deseado- SMN             
+ -57.28  -35.37 NH0177.DAT    33.0   7 Punta Indio - SMN               
+ -59.70  -29.18 NH0309.DAT    87.0   7 Reconquista- SMN                
+ -59.05  -27.45 NH0489.DAT   119.0   7 Resistencia- SMN                
+ -64.08  -39.02 NH0229.DAT     0.0   6 Rio Colorado- SMN               
+ -64.23  -33.12 NH0138.DAT     6.0   7 Rio Cuarto- SMN                 
+ -67.75  -53.80 NH0296.DAT     6.3   7 Rio Grande- SMN                 
+ -64.56  -27.29 NH0458.DAT    39.0   7 Rio Hondo-Sgo del Estero        
+ -62.90  -24.17 NH0006.DAT    24.0   7 Rivadavia- SMN                  
+ -60.45  -26.82 NH0034.DAT    71.0   7 Roque Saenz Peña- SMN           
+ -60.78  -32.92 NH0133.DAT    59.6   7 Rosario- SMN                    
+ -65.48  -24.85 NH0012.DAT    18.0   7 Salta- SMN                      
+ -64.95  -40.73 NH0241.DAT     0.0   7 San Antonio Oeste- SMN          
+ -69.03  -33.77 NH0143.DAT     0.0   6 San Carlos - SMN                
+ -58.58  -34.45 NH0553.DAT    52.0   6 San Fernando - SMN              
+ -68.42  -31.57 NH0495.DAT     0.0   7 San Juan- SMN                   
+ -67.75  -49.32 NH0285.DAT     0.1   7 San Julian - SMN                
+ -66.35  -33.27 NH0139.DAT    19.3   7 San Luis- SMN                   
+ -68.42  -33.08 NH0370.DAT     0.0   7 San Martin(Mza.)- SMN           
+ -59.68  -33.68 NH0492.DAT    12.0   7 San Pedro-INTA                  
+ -68.40  -34.58 NH0325.DAT     3.4   7 San Rafael - SMN                
+ -68.57  -50.02 NH0289.DAT     0.2   7 Santa Cruz - SMN                
+ -64.27  -36.57 NH0192.DAT    33.0   7 Santa Rosa- SMN                 
+ -65.32  -32.67 NH0572.DAT    14.0   7 Santa Rosa de Conlara - SMN     
+ -64.30  -27.77 NH0062.DAT    21.0   7 Santiago del Estero- SMN        
+ -60.82  -31.70 NH0451.DAT    96.0   7 Sauce Viejo- SMN                
+ -59.25  -37.23 NH0311.DAT    26.0   7 Tandil- SMN                     
+ -63.82  -22.65 NH0326.DAT    53.5   7 Tartagal- SMN                   
+ -67.57  -28.07 NH0065.DAT     0.0   7 Tinogasta - SMN                 
+ -65.26  -43.20 NH0258.DAT     7.1   7 Trelew - SMN                    
+ -62.74  -35.97 NH0185.DAT    32.0   6 Trenque Lauquen - SMN           
+ -60.25  -38.33 NH0490.DAT    46.0   7 Tres Arroyos- SMN               
+ -65.10  -26.85 NH0017.DAT    40.0   7 Tucuman- SMN                    
+ -68.32  -54.80 NH0298.DAT     7.1   7 Ushuaia- SMN                    
+ -69.33  -32.60 NH0308.DAT     0.0   7 Uspallata - SMN                 
+ -61.95  -33.75 NH0551.DAT    23.0   7 Venado Tuerto- SMN              
+ -65.43  -36.22 NH0188.DAT    15.0   7 Victorica - SMN                 
+ -63.02  -40.85 NH0501.DAT     0.2   7 Viedma- SMN                     
+ -65.13  -31.95 NH0117.DAT     1.0   7 Villa Dolores- SMN              
+ -57.00  -37.25 NH0013.DAT    17.0   7 Villa Gesell - SMN              
+ -63.68  -29.90 NH0082.DAT     8.0   7 V.Maria del Rio Seco- SMN       
+ -58.48  -34.58 NH0156.DAT    62.0   7 V.Ortuzar- SMN                  
+ -65.38  -33.73 NH0335.DAT    14.0   7 Villa Reynolds- SMN             
+ -58.08  -29.23 NH0075.DAT    99.0   7 Mercedes- SMN                   
+ -61.50  -31.27 NH0573.DAT    71.0   7 Rafaela- SMN                    
+ -61.33  -30.97 NH0574.DAT    75.0   7 Sunchales - SMN                 
+ -58.42  -34.57 NH0332.DAT    70.0   7 Buenos Aires- AERO- SMN         

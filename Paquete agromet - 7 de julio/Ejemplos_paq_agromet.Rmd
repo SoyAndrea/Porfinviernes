@@ -1,0 +1,303 @@
+---
+title: "Ejemplos de uso del paquete {agromet}"
+output: github_document
+---
+
+PRIMERO SE INSTALARÁ EL PAQUETE AGROMET:
+  
+#este paquete se encuentra publicado en su https://github.com/AgRoMeteorologiaINTA/agromet.
+descargamos desde el repositorio de Github que puede ser bajando el archivo ZIP
+o DE MANERA REMOTA
+
+##Para la gente que usa windows: ver comentario al final sobre Rtools
+
+```{r}
+#Para instalar la versión de desarrollo desde GitHub, usá:
+# install.packages("remotes")
+remotes::install_github("AgRoMeteorologiaINTA/agromet", build_vignettes = TRUE)
+
+#para usar vignette
+vignette("estadisticas-e-indices-climaticos", "agromet") # hay disponible ejemplos
+
+```
+
+ 
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(agromet)
+library(dplyr)
+library(lubridate)
+library(ggplot2)
+library(knitr)
+library(tidyverse)
+```
+
+## Lectura de archivo NH
+
+Asumiendo que los datos de estaciones meteorológicas están en una carpeta "datos" dentro del proyecto, la función `leer_nh()` funciona así:
+
+```{r lectura}
+datos <- leer_nh("nombre y ubicación del archivo") #hay que modificar
+head(datos)
+
+```
+
+Además la funciónn `metadatos_nh()` devuelve un data frame con los metadatos de las estaciones que se puede utilizar para conocer el nombre y ubicación de las estaciones del SMN e INTA. 
+
+En el paquete solo están disponibles los datos de la estación agrometeorológica de INTA Castelar (1951-2020), si quieren ver los datos solo basta con poner NH0358
+
+```{r metadata}
+
+metadatos_nh() 
+metadatos_nh(codigo = "0111") #elijo la que yo quiero porque conozco su código
+
+NH0358 # asi puedo ver los datos históricos de INTA Castelar
+
+```
+
+#COMENCEMOS A PROBAR ALGUNAS FUNCIONES
+
+#FUNCIÓN PARA CALCULAR: Fecha media de primera y última helada
+```{r dias_promedios}
+  
+fecha_media <- datos %>%
+  filter(t_min <= 0) %>% 
+ # summarise(dias_promedio(fecha))
+  
+  reframe(dias_promedio(fecha))    #con la versión dplyr 1.1.2 se usa la función reframe VER DE QUE SE TRATA EN PROFUNDIDAD
+  
+  kable(fecha_media)
+
+```
+
+
+#FUNCIÓN PARA CALCULO DEL INDICE DE TEMPERATURA Y HUMEDAD
+
+```{r ith}
+
+datos_ith <-  datos %>% 
+  select(fecha,t_max,t_min,hr) %>% 
+  filter(fecha >= "2020-01-01" & fecha < "2020-02-01") %>%
+  mutate(tmed = round((t_max + t_min)/2,1), ith = round(ith(tmed, hr),1)) 
+
+head(datos_ith)
+
+```
+
+
+## Conteo de días que cumplen con alguna condición
+
+Para contar la cantidad de días con temperatura por encima de un umbral o días con precipitación igual a cero (o básicamente que cualquier variable cumpla con cualquier condición) se utiliza la función `umbrales()´
+
+Por ejemplo si queremos la cantidad de días donde la temperatura máxima fue mayor o igual a 35 grados en toda la serie.
+
+```{r umbrales-1}
+datos %>% 
+  group_by(fecha = lubridate::floor_date(fecha, "1 month")) %>% 
+  reframe(umbrales(t_35 = t_max >= 35, 
+                     t_0  = t_min <= 0)) %>%
+  filter(lubridate::month(fecha) == 1) %>% 
+  ggplot(aes(fecha, N)) +
+  geom_line(aes(color = extremo))
+
+```
+
+Pero si quisiéramos hacer el mismo conteo para cada año y analizar la variabilidad climática:
+
+```{r umbrales-2}
+datos %>% 
+  group_by(anio = floor_date(fecha, "year")) %>% 
+  summarise(umbrales(t_30 = t_max >= 35))
+
+```
+
+Esta función también acepta contar cantidad de días según distintos umbrales. De yapa, un gráfico.
+
+
+```{r umbrales-3}
+datos %>% 
+  group_by(anio = floor_date(fecha, "year")) %>% 
+  summarise(umbrales(#t_30 = t_max >= 30, 
+                     t_35 = t_max >= 35)) %>% 
+  ggplot(aes(anio, N)) +
+  geom_line(aes(color = extremo))
+```
+y con este grafico pueden por ejemplo analizar la variabilidad interanual de este índice y la tendencia
+
+
+
+### Persistencia 
+
+Un dato importante para cualquier extremo es la longitud de días *consecutivos* con el extremo. La función `olas` (olas de calor, olas de frío) divide una serie de fechas en eventos de observaciones consecutivas donde se da una condición lógica. 
+
+```{r}
+olas_de_temperatura <- datos %>% 
+  reframe(olas(fecha, 
+                 mucho_calor = t_max >= 35, 
+                 helada = t_min <= 0))
+
+head(olas_de_temperatura)
+```
+
+Nuevamente, se podría visualizar el cambio en la longitud promedio de las olas de calor y de olas de heladas de esta forma: 
+
+```{r}
+olas_de_temperatura %>% 
+  group_by(ola, anio = year(inicio)) %>% 
+  summarise(longitud = mean(longitud)) %>% 
+  ggplot(aes(anio, longitud)) +
+  geom_line() +
+  geom_smooth(method = "glm", method.args = list(family = "quasipoisson")) +
+  facet_wrap(~ola, scales = "free") 
+```
+
+
+###ANALISIS CON DATOS DE PRECIPITACIÓN
+
+
+```{r}
+datos_mensuales <- datos %>% 
+  group_by(fecha = lubridate::round_date(fecha, "month")) %>% 
+  reframe(precip = sum(precip, na.rm = TRUE),
+                      etp = sum(etp, na.rm = TRUE))
+
+head(datos_mensuales)
+```
+
+
+
+### Anomalía porcentual
+
+Una primera aproximacion es calcular cuánto se desvía la precipitación cada mes de su valor típico en procentaje.
+
+```{r}
+datos_mensuales <- datos_mensuales %>% 
+  group_by(mes = month(fecha)) %>% 
+  mutate(anomalia = anomalia_porcentual(precip, na.rm = TRUE))
+
+head(datos_mensuales)
+```
+
+
+### Deciles
+
+Otor indicador que puede analizarse es el decil al que pertenece la precipitación de cada mes. 
+
+```{r}
+datos_mensuales <- datos_mensuales %>% 
+  group_by(mes = month(fecha)) %>% 
+  mutate(decil = decil(precip)) %>% 
+  ungroup()
+
+head(datos_mensuales)
+```
+
+
+## SPI
+
+La función `spi` calcula el SPI para distintas escalas: 
+
+```{r}
+datos %>% 
+  summarise(spi(fecha, precip, 1:24)) %>% 
+  head()
+```
+
+La salida se puede graficar fácilmente con ggplot (NO SE PORQUE NO FUNCIONO, AHORA TARDA MUCHO OJO!)
+
+```{r}
+referencia <- datos %>% 
+  filter(year(fecha) <= 1980) %>% 
+  reframe(spi_referencia(fecha, precip))
+
+datos %>% 
+  reframe(spi(fecha, precip, 1:24, 
+                referencia = referencia)) %>% 
+  ggplot(aes(fecha, escala)) +
+  geom_contour_filled(aes(z = spi, fill = stat(level_mid))) +
+  scale_fill_gradient2()
+```
+
+### Índice de intensidad de sequía de Palmer
+
+Un indicador de sequía muy utilizado es el PDSI (Palmer Drought Severity Index) que además de la precipitación, tiene en cuenta la evapotranspiración potencial (etp) y la capacidad de carga (cc) del suelo. agromet provee una función `pdsi()` que computa el PSDI usando los coeficientes originales de Palmer y una función `pdsi_ac()` que usa la version autocalibrada.
+
+
+```{r}
+datos %>% 
+  group_by(fecha = floor_date(fecha, "month")) %>% 
+  summarise(prcp = sum(precip, na.rm = TRUE),
+            etp = sum(etp, na.rm = TRUE)) %>% 
+  ungroup() %>% 
+  mutate(pdsi_ac = pdsi_ac(prcp, etp,cc=180),
+         pdsi    = pdsi(prcp, etp,cc=180)) %>% 
+  ggplot(aes(fecha, pdsi)) +
+  geom_line() +
+  geom_line(aes(y = pdsi_ac), color = "red")
+```
+
+
+#VAMOS A MAPEAR
+ mapear()    escala_pp_diaria()   mapa_argentina()
+
+
+```{r mapear}
+ # Argentina y sus provincias
+ ggplot() +
+   geom_sf(data = mapa_provincias())
+
+# Algunas provincias y sus departamentos
+ ggplot() +
+   geom_sf(data = mapa_provincias(provincias = c("La Pampa"),
+                                 departamentos = TRUE))
+ 
+```
+
+Para este ultimo ejemplo, les dejo los datos y la escala para que vean como se usan
+
+```{r mapa}
+
+datos_ppsem <- read_table("Datos/pp23-29no.dat")
+
+#si tenes definida una escala de colores en formato .lvl
+escala_semanal <- leer_surfer("Datos/PP-semanal.lvl")
+
+datos_ppsem %>% 
+  with(mapear(valor= PROMEDIO, lat= LATITUD, lon= LONGITUD, cordillera = TRUE,
+              escala = escala_semanal,
+              titulo = "Precipitacion", fuente = "Fuente: datos de ejemplo"))
+
+
+mapa <- with(datos_ppsem,mapear(valor= PROMEDIO,lon = LONGITUD,lat = LATITUD,
+                           cordillera = TRUE,
+                           escala = escala_pp_mensual,
+                           variable = "mm",
+                           titulo = "Precipitación del mes de Enero/2020",
+                           fuente = "Fuente: datos estaciones SMN e INTA")) 
+   
+
+
+```
+
+
+
+
+
+#COMENTARIO EXTRA
+para poder correr cualquier paquete de R en Windows y trabajen juntos es necesario instalar Rtools
+todo funciona pero es mejor tenerlo instalado
+
+#pasos a seguir.
+1- bajar la versión desde CRAN https://cran.rstudio.com/bin/windows/Rtools/
+2- Instalarla
+3- hay que crear un archivo especifico para que R pueda acceder a Rtools, para ello corré esta línea desde Rstudio:    
+#  writeLines('PATH="${RTOOLS40_HOME}\\usr\\bin;${PATH}"', con = "~/.Renviron")
+4- luego hay que verificar si está bien instalado y tambien desde Rstudio corré esta:  
+# Sys.which("make")
+en la cual tenes que ver que te aparezca este mensaje:   C:\\rtools40\\usr\\bin\\make.exe
+
+la versión de Rtool tiene que ser igual a la de R
+
+# y listo!
+
