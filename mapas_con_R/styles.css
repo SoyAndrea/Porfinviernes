@@ -1,0 +1,180 @@
+a, a > code {
+  color: rgb(249, 38, 114);
+  text-decoration: none;
+}
+
+.texmacro {
+  visibility: hidden;
+}
+
+.footnote {
+  position: absolute;
+  bottom: 3em;
+  padding-right: 4em;
+  font-size: 90%;
+}
+.remark-code-line-highlighted     {
+  background-color: #ffff88;
+}
+
+.inverse {
+  background-color: #272822;
+  color: #d6d6d6;
+  text-shadow: 0 0 20px #333;
+}
+
+.inverse h1, .inverse h2, .inverse h3 {
+  color: #f3f3f3;
+}
+
+/*
+.logo {
+  background-image: url("logo_FCA.png");
+  background-size: contain;
+  background-repeat: no-repeat;
+  position: absolute;
+  bottom: 1em;
+  left: 1em;
+  width: 180px;
+  height: 40px;
+  z-index: 0;
+}
+*/
+
+.remark-slide-number {
+  display: none;
+}
+
+.hide-count .remark-slide-number {
+  display: none;
+}
+
+/* Two-column layout */
+.left-column {
+  color: #777;
+  width: 20%;
+  height: 92%;
+  float: left;
+}
+.left-column h2:last-of-type, .left-column h3:last-child {
+  color: #000;
+}
+.right-column {
+  width: 75%;
+  float: right;
+  padding-top: 1em;
+}
+.pull-left {
+  float: left;
+  width: 47%;
+}
+.pull-right {
+  float: right;
+  width: 47%;
+}
+.pull-right + * {
+  clear: both;
+}
+
+.remark-slide table {
+  margin: auto;
+  border-top: 1px solid #666;
+  border-bottom: 1px solid #666;
+}
+.remark-slide table thead th {
+  border-bottom: 1px solid #ddd;
+}
+
+th, td {
+  padding: 5px;
+}
+
+.remark-slide thead, .remark-slide tfoot, .remark-slide tr:nth-child(even) {
+  background: #eee
+}
+
+.red { color: red; }
+.blue { color: blue; }
+.green { color: green; }
+.yellow { color: yellow; }
+
+.scrollable {
+  height: 25em;
+  width: 40em;
+  overflow-y: auto;
+}
+
+/* H1 fonts  */
+.title-slide h1 {
+  color: #ffffff;
+  font-weight: normal;
+  font-size: 45px;
+  padding: 20px;
+  text-align: left;
+  vertical-align: middle;
+  margin-bottom: 18px;
+}
+
+/* H2 fonts */
+.title-slide h2 {
+  color: #ffffff;
+  font-size: 35px;
+  padding-left: 20px;
+  padding-bottom: 10px;
+  margin-top: 0px;
+  text-align: left;
+  vertical-align: middle;
+}
+
+/* H3 fonts */
+.title-slide h3 {
+  font-size: 28px;
+  font-weight: normal;
+  color: #ffffff;
+  padding-left: 20px;
+  margin: 0px;
+  line-height: 1;
+  text-align: left;
+  vertical-align: middle;
+}
+
+/* Remove slide count */
+.title-slide .remark-slide-number {
+  display: none;
+}
+
+/* Tables */
+table {
+  width: auto !important;
+  border-collapse: collapse !important;
+  background-color: white !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  margin-bottom: 1.5em !important;
+  color: black !important;
+  border-right: none !important;
+  border-left: none !important;
+  border-top: solid 1px black ! important;
+  border-bottom: solid 1px black !important;
+}
+
+th {
+  border-bottom: solid 1px black !important;
+  background: white !important;
+  color: black !important;
+  font-size: 14pt !important;
+  padding: 5px !important;
+}
+
+td, tr {
+  background: white !important;
+  color: black !important;
+  font-size: 14pt !important;
+  padding: 5px !important;
+}
+
+/* wrap output
+pre code {
+  white-space: pre-wrap;
+}
+*/

@@ -1,0 +1,369 @@
+---
+title: "Haciendo mapas en R"
+author: "Dr. Agustín Alesso"
+institute: "Dept. of Crop Sciences | University of Illinois "
+subtitle: "PoRfin VieRnes"
+output: 
+  xaringan::moon_reader:
+    seal: false
+    lib_dir: libs 
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+      ratio: '16:9'
+    css: ['styles.css', 'fonts.css', 'print.css']
+    self_contained: true  #true para cuando se publica
+---
+class: title-slide, middle, hide-count, inverse
+background-size: 15%
+background-position: 10% 90%
+
+```{r setup, include=FALSE}
+#Packages
+pacman::p_load(knitr, tidyverse, patchwork, xfun, tmap, leaflet, sp, DiagrammeR)
+xaringanExtra::use_tile_view()
+# xaringanExtra::use_clipboard()
+
+htmltools::tagList(
+  xaringanExtra::use_clipboard(
+    button_text = "<i class=\"fa fa-clipboard\"></i>",
+    success_text = "<i class=\"fa fa-check\" style=\"color: #90BE6D\"></i>",
+  ),
+  rmarkdown::html_dependency_font_awesome()
+)
+
+#Options
+opts_chunk$set(
+  echo = T, comment = NA, warning = FALSE, message = FALSE, fig.align = 'center', cache =T
+)
+options(width = 70)
+tema <- theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
+
+# Functions
+source(here::here("./mapas_con_R/out_lines.R"))
+```
+
+# `r rmarkdown::metadata$title`
+
+<br>
+
+## `r rmarkdown::metadata$author`
+  
+### `r rmarkdown::metadata$subtitle`
+
+### `r rmarkdown::metadata$institute`
+
+
+???
+
+---
+## Outline
+
+.pull-left[
+
+-   Por que hacer mapas? y porque en R?
+-   Evolución datos espaciales en R
+-   Mapas estáticos vs interactivos
+-   base?
+-   spplot
+-   ggplot
+-   tmap
+-   leaflet
+-   Referencias
+
+]
+
+???
+
+--
+
+.pull-right[
+
+<br><br><br><br><br>
+<br><br><br><br><br>
+
+.small[
+
+Codigo reproducible. You need to install/load these packages before run it.
+
+```{r, eval = F}
+install.packages("pacman")
+pacman::p_load(tidyverse, rio, GGally, car, ggpmisc)
+```
+
+Or, you can try out the code using this r # embed_file("intro-to-mlr-notebook.Rmd", text = "R-notebook") `r fontawesome::fa("download")`
+
+]
+
+]
+
+
+---
+name: why-MLR
+
+## ¿Por qué hacer mapas?
+
+.pull-left[
+
+```{r, echo = F, out.width="80%", fig.cap="Mapa de Cólera Londers 1854"}
+include_graphics("https://upload.wikimedia.org/wikipedia/commons/c/c7/Snow-cholera-map.jpg")
+```
+
+]
+
+???
+
+
+Maps have been used for several thousand years for a wide variety of purposes. Historic examples include maps of buildings and land ownership in the Old Babylonian dynasty more than 3000 years ago and Ptolemy’s world map in his masterpiece Geography nearly 2000 years ago
+
+En uno de los primeros análisis de datos espaciales el Dr. Snow mapeó los casos de cólera en el barrio Soho de Londres y la disposición de las estaciones de bombeo.
+
+De la visualización de ambas capas de información descubró que el pozo contaminado se encontraba en la calle Broad.
+
+--
+
+.pull-right[
+
+
+- Ideal para visualizar, explorar o analizar datos espaciales 
+
+- Permiten ver tendencias, patrones, detectar anomalías, outliers, etc
+
+- Modo efectivo para comunicar resultados de análisis de datos espaciales
+
+{{content}}
+
+]
+
+
+???
+
+
+Los mapas permien ver tendencias, patrones, valores extraños, etc
+
+Ejemplo de tendencia
+
+Ejemplo clásico pozos y colera
+
+
+--
+
+`r fontawesome::fa("exclamation-triangle")` **Cuidado**:
+
+Mapas mal preparados pueden dificultar la comunicacion de resultados. Algunos problemas comunes:
+
+- mala ubicación de los componnts
+
+- tamaño y legibilidad del texto
+
+- falta de referencias/leyenda
+
+- mala elección de colores y simbología
+
+`r fontawesome::fa("book")` Acá una guía de estilo de [Journal of Maps](https://files.taylorandfrancis.com/TJOM-suppmaterial-quick-guide.pdf)
+
+
+???
+
+---
+name: spatial
+
+## Datos espaciales en R: evolución 
+
+.footnote[
+Fuente: [R-Bloggers](https://www.r-bloggers.com/2023/06/upcoming-changes-to-popular-r-packages-for-spatial-data-what-you-need-to-do/), [Bivand et al. (2021)](https://link.springer.com/article/10.1007/s10109-020-00336-0#Sec2)
+
+]
+
+---
+template: spatial
+
+.pull-left[
+
+```{r, echo = F, out.height="20%"}
+grViz("
+  digraph {
+    node [shape = circle, width = 1.1]
+    sp -> {}
+    # sp -> {maptools rgdal rgeos}
+    # sp -> {raster spacetime}
+    # rgdal -> sf
+    # rgeos -> sf
+    # raster -> terra
+    # raster -> stars
+    # spacetime -> stars
+  }")
+```
+]
+
+.pull-right[
+
+Proveía las clases `Spatial*` y `Spatial*DataFrame` y sus métodos
+
+
+```{r}
+library(sp)
+data(meuse)
+coordinates(meuse) <- ~x+y
+proj4string(meuse) <- CRS("+init=epsg:28992")
+meuse
+```
+
+Slots para: `bbox`, `coords`, `proj4string` y `data` (los que `*DataFrame`
+
+
+]
+
+
+---
+template: spatial
+
+.pull-left[
+
+```{r, echo = F}
+rootgrViz("
+  digraph {
+    
+    graph [layout = dot, rankdir = TB, fontsize = 10]
+  
+    node [shape = circle, width = 1.1]
+  
+    sp 
+    maptools 
+    rgdal 
+    rgeos 
+    spacetime
+    raster
+    sf
+    stars
+    terra
+  
+    sp -> maptools {style = dot}
+    sp -> {rgeos rgdal} {rank  = same; rgeos; rgdal}
+    sp -> {raster spacetime} {rank = same; raster;spacetime; rgeos; rgdal}  
+    {rgeos rgdal} -> sf
+  
+    
+    raster -> {terra, stars}
+    spacetime -> stars
+  }")
+```
+
+]
+
+.pull-right[
+
+`maptools` utilidades varias (discontinuado)
+
+`rgdal` para leer/guardardatos espaciales
+
+`rgeos` para operar vectores
+
+
+]
+
+---
+template: spatial
+
+.pull-left[
+
+```{r, echo = F}
+grViz("
+  digraph {
+    node [shape = circle, width = 1.1]
+    sp
+    sp -> {maptools rgdal rgeos}
+    sp -> {raster spacetime}
+    rgdal -> sf
+    rgeos -> sf
+    # raster -> terra
+    # raster -> stars
+    # spacetime -> stars
+  }")
+```
+
+]
+
+---
+template: spatial
+
+```{r, echo = F}
+grViz("
+  digraph {
+    node [shape = circle, width = 1.1]
+    sp
+    sp -> {maptools rgdal rgeos}
+    sp -> {raster spacetime}
+    rgdal -> sf
+    rgeos -> sf
+    # raster -> terra
+    raster -> stars
+    spacetime -> stars
+  }")
+```
+
+---
+template: spatial
+
+.pull-left[
+
+```{r, echo = F}
+grViz("
+  digraph {
+    node [shape = circle, width = 1.1]
+    sp
+    sp -> {maptools rgdal rgeos}
+    sp -> {raster spacetime}
+    rgdal -> sf
+    rgeos -> sf
+    raster -> terra
+    raster -> stars
+    spacetime -> stars
+  }")
+```
+
+]
+
+.pull-right[
+
+Mas texto
+
+]
+
+---
+## Mapas estáticos vs interactivos
+
+.pull-left[
+
+Al principio sólo podían hacerse mapas estaticos con R.
+
+```{r}
+
+```
+
+
+]
+
+
+---
+### Paquetes para mapear
+
+.pull-left[
+
+-   base?
+
+]
+
+--
+
+.pull-right[
+
+]
+
+
+-   spplot
+-   ggplot
+-   tmap
+-   leaflet
+-   Referencias
