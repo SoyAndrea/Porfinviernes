@@ -173,17 +173,7 @@ name: spatial
 
 ## Datos espaciales en R: evolución 
 
-.footnote[
-Fuente: [R-Bloggers](https://www.r-bloggers.com/2023/06/upcoming-changes-to-popular-r-packages-for-spatial-data-what-you-need-to-do/), [Bivand et al. (2021)](https://link.springer.com/article/10.1007/s10109-020-00336-0#Sec2)
-
-]
-
----
-template: spatial
-
-.pull-left[
-
-```{r, echo = F, out.height="20%"}
+```{r, echo = F, include = F}
 # solo sp
 grafico1 <- create_graph(attr_theme = "tb") |> 
   add_node(label = "sp")
@@ -224,38 +214,28 @@ grafico7 <- grafico6 |>
   add_node(label = "terra") |> 
   add_edge(from = 5, to = 9) 
 
-# serie de graficos
-graficos <- create_graph_series() |> 
-  add_graph_to_graph_series(grafico1) |> 
-  add_graph_to_graph_series(grafico2) |> 
-  add_graph_to_graph_series(grafico3) |> 
-  add_graph_to_graph_series(grafico4) |> 
-  add_graph_to_graph_series(grafico5) |> 
-  add_graph_to_graph_series(grafico6) |> 
-  add_graph_to_graph_series(grafico7)
 
-# Render
-render_graph_from_graph_series(graficos, 1)
-render_graph_from_graph_series(graficos, 2)
-render_graph_from_graph_series(graficos, 3)
-render_graph_from_graph_series(graficos, 4)
-render_graph_from_graph_series(graficos, 5)
-render_graph_from_graph_series(graficos, 6)
-render_graph_from_graph_series(graficos, 7)
-
-grViz("
-  digraph {
-    node [shape = circle, width = 1.1]
-    sp -> {}
-    # sp -> {maptools rgdal rgeos}
-    # sp -> {raster spacetime}
-    # rgdal -> sf
-    # rgeos -> sf
-    # raster -> terra
-    # raster -> stars
-    # spacetime -> stars
-  }")
 ```
+
+
+.footnote[
+Fuente: [R-Bloggers](https://www.r-bloggers.com/2023/06/upcoming-changes-to-popular-r-packages-for-spatial-data-what-you-need-to-do/), [Bivand et al. (2021)](https://link.springer.com/article/10.1007/s10109-020-00336-0#Sec2)
+
+]
+
+---
+template: spatial
+
+.pull-left[
+
+
+```{r, echo = F, include = F}
+# solo sp
+grafico1 <- create_graph(attr_theme = "tb") |> 
+  add_node(label = "sp")
+render_graph(grafico1)
+```
+
 ]
 
 .pull-right[
@@ -283,32 +263,11 @@ template: spatial
 .pull-left[
 
 ```{r, echo = F}
-rootgrViz("
-  digraph {
-    
-    graph [layout = dot, rankdir = TB, fontsize = 10]
-  
-    node [shape = circle, width = 1.1]
-  
-    sp 
-    maptools 
-    rgdal 
-    rgeos 
-    spacetime
-    raster
-    sf
-    stars
-    terra
-  
-    sp -> maptools {style = dot}
-    sp -> {rgeos rgdal} {rank  = same; rgeos; rgdal}
-    sp -> {raster spacetime} {rank = same; raster;spacetime; rgeos; rgdal}  
-    {rgeos rgdal} -> sf
-  
-    
-    raster -> {terra, stars}
-    spacetime -> stars
-  }")
+# sp a maptools
+grafico2 <- grafico1 |>  
+  add_node(label = "maptools") |> 
+  add_edge(from = 1, to = 2)
+render_graph(grafico2)
 ```
 
 ]
@@ -317,10 +276,58 @@ rootgrViz("
 
 `maptools` utilidades varias (discontinuado)
 
+]
+
+---
+template: spatial
+
+.pull-left[
+
+```{r, echo = F}
+# sp rgeos/gdal
+grafico3 <- grafico2 |>  
+  add_node(label = "rgeos") |> 
+  add_edge(from = 1, to = 3) |> 
+  add_node(label = "rgdal") |> 
+  add_edge(from = 1, to = 4) |> 
+  add_node(label = "raster") |> 
+  add_edge(from = 1, to = 5) |> 
+  set_node_attrs(nodes = 2, node_attr = stype, value = "dashed")
+render_graph(grafico3)
+```
+
+]
+
+.pull-right[
+
+`maptools` utilidades varias (discontinuado en )
+
 `rgdal` para leer/guardardatos espaciales
 
 `rgeos` para operar vectores
 
+`raster` para operar rasters
+
+
+]
+---
+template: spatial
+
+.pull-left[
+
+```{r, echo = F}
+# raster spacetime
+grafico4 <- grafico3 |>  
+  add_node(label = "spacetime") |> 
+  add_edge(from = 1, to = 6)
+render_graph(grafico4)
+```
+
+]
+
+.pull-right[
+
+- Otros paquetes para con clases y metodos para objetos tipo raster y espacio-tiempo
 
 ]
 
@@ -330,39 +337,40 @@ template: spatial
 .pull-left[
 
 ```{r, echo = F}
-grViz("
-  digraph {
-    node [shape = circle, width = 1.1]
-    sp
-    sp -> {maptools rgdal rgeos}
-    sp -> {raster spacetime}
-    rgdal -> sf
-    rgeos -> sf
-    # raster -> terra
-    # raster -> stars
-    # spacetime -> stars
-  }")
+# sf
+grafico5 <- grafico4 |>  
+  add_node(label = "sf") |> 
+  add_edge(from = 3, to = 7) |> 
+  add_edge(from = 4, to = 7) 
+render_graph(grafico5)
+```
+
+
+```{r, echo = F}
+# stars
+grafico6 <- grafico5 |>  
+  add_node(label = "stars") |> 
+  add_edge(from = 5, to = 8) |> 
+  add_edge(from = 6, to = 8) 
+render_graph(grafico6)
+```
+
+
+```{r, echo = F}
+# terra
+grafico7 <- grafico6 |>  
+  add_node(label = "terra") |> 
+  add_edge(from = 5, to = 9) 
+render_graph(grafico7)
 ```
 
 ]
 
----
-template: spatial
+.pull-right[
 
-```{r, echo = F}
-grViz("
-  digraph {
-    node [shape = circle, width = 1.1]
-    sp
-    sp -> {maptools rgdal rgeos}
-    sp -> {raster spacetime}
-    rgdal -> sf
-    rgeos -> sf
-    # raster -> terra
-    raster -> stars
-    spacetime -> stars
-  }")
-```
+Mas texto
+
+]
 
 ---
 template: spatial
@@ -370,18 +378,72 @@ template: spatial
 .pull-left[
 
 ```{r, echo = F}
-grViz("
-  digraph {
-    node [shape = circle, width = 1.1]
-    sp
-    sp -> {maptools rgdal rgeos}
-    sp -> {raster spacetime}
-    rgdal -> sf
-    rgeos -> sf
-    raster -> terra
-    raster -> stars
-    spacetime -> stars
-  }")
+# sf
+grafico5 <- grafico4 |>  
+  add_node(label = "sf") |> 
+  add_edge(from = 3, to = 7) |> 
+  add_edge(from = 4, to = 7) 
+render_graph(grafico5)
+```
+
+
+```{r, echo = F}
+# stars
+grafico6 <- grafico5 |>  
+  add_node(label = "stars") |> 
+  add_edge(from = 5, to = 8) |> 
+  add_edge(from = 6, to = 8) 
+render_graph(grafico6)
+```
+
+
+```{r, echo = F}
+# terra
+grafico7 <- grafico6 |>  
+  add_node(label = "terra") |> 
+  add_edge(from = 5, to = 9) 
+render_graph(grafico7)
+```
+
+]
+
+.pull-right[
+
+Mas texto
+
+]
+
+---
+template: spatial
+
+.pull-left[
+
+```{r, echo = F}
+# sf
+grafico5 <- grafico4 |>  
+  add_node(label = "sf") |> 
+  add_edge(from = 3, to = 7) |> 
+  add_edge(from = 4, to = 7) 
+render_graph(grafico5)
+```
+
+
+```{r, echo = F}
+# stars
+grafico6 <- grafico5 |>  
+  add_node(label = "stars") |> 
+  add_edge(from = 5, to = 8) |> 
+  add_edge(from = 6, to = 8) 
+render_graph(grafico6)
+```
+
+
+```{r, echo = F}
+# terra
+grafico7 <- grafico6 |>  
+  add_node(label = "terra") |> 
+  add_edge(from = 5, to = 9) 
+render_graph(grafico7)
 ```
 
 ]
