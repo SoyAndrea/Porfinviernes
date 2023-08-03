@@ -15,7 +15,7 @@ output:
     css: ['styles.css', 'fonts.css', 'print.css']
     self_contained: true  #true para cuando se publica
 editor_options: 
-  chunk_output_type: console
+  chunk_output_type: inline
 ---
 class: title-slide, middle, hide-count, inverse
 background-size: 15%
@@ -23,7 +23,7 @@ background-position: 10% 90%
 
 ```{r setup, include=FALSE}
 #Packages
-pacman::p_load(knitr, tidyverse, patchwork, xfun, tmap, leaflet, sp, DiagrammeR)
+pacman::p_load(knitr, tidyverse, patchwork, xfun, tmap, leaflet, sp, DiagrammeR, ggvenn)
 xaringanExtra::use_tile_view()
 # xaringanExtra::use_clipboard()
 
@@ -37,7 +37,7 @@ htmltools::tagList(
 
 #Options
 opts_chunk$set(
-  echo = T, comment = NA, warning = FALSE, message = FALSE, fig.align = 'center', cache =T
+  echo = T, comment = NA, warning = FALSE, message = FALSE, fig.align = 'center', cache =F
 )
 options(width = 70)
 tema <- theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
@@ -173,52 +173,8 @@ name: spatial
 
 ## Datos espaciales en R: evolución 
 
-```{r, echo = F, include = F}
-# solo sp
-grafico1 <- create_graph(attr_theme = "tb") |> 
-  add_node(label = "sp")
-
-# sp a maptools
-grafico2 <- grafico1 |>  
-  add_node(label = "maptools") |> 
-  add_edge(from = 1, to = 2)
-
-# sp rgeos/gdal
-grafico3 <- grafico2 |>  
-  add_node(label = "rgeos") |> 
-  add_edge(from = 1, to = 3) |> 
-  add_node(label = "rgdal") |> 
-  add_edge(from = 1, to = 4)
-
-# raster spacetime
-grafico4 <- grafico3 |>  
-  add_node(label = "raster") |> 
-  add_edge(from = 1, to = 5) |> 
-  add_node(label = "spacetime") |> 
-  add_edge(from = 1, to = 6)
-
-# sf
-grafico5 <- grafico4 |>  
-  add_node(label = "sf") |> 
-  add_edge(from = 3, to = 7) |> 
-  add_edge(from = 4, to = 7) 
-
-# stars
-grafico6 <- grafico5 |>  
-  add_node(label = "stars") |> 
-  add_edge(from = 5, to = 8) |> 
-  add_edge(from = 6, to = 8) 
-
-# terra
-grafico7 <- grafico6 |>  
-  add_node(label = "terra") |> 
-  add_edge(from = 5, to = 9) 
-
-
-```
-
-
 .footnote[
+
 Fuente: [R-Bloggers](https://www.r-bloggers.com/2023/06/upcoming-changes-to-popular-r-packages-for-spatial-data-what-you-need-to-do/), [Bivand et al. (2021)](https://link.springer.com/article/10.1007/s10109-020-00336-0#Sec2)
 
 ]
@@ -228,8 +184,11 @@ template: spatial
 
 .pull-left[
 
+```{r, echo = F, out.width="20%", include = F}
+include_graphics(c("https://avatars.githubusercontent.com/u/520851?v=4", "https://www.nhh.no/contentassets/4612ef8b3afd4bb99cd97c72f856816e/s1155.jpg?width=400&factor=2&quality=90"))
+```
 
-```{r, echo = F, include = F}
+```{r, echo = F, out.width="30%", fig.align="center"}
 # solo sp
 grafico1 <- create_graph(attr_theme = "tb") |> 
   add_node(label = "sp")
@@ -240,19 +199,17 @@ render_graph(grafico1)
 
 .pull-right[
 
-Proveía las clases `Spatial*` y `Spatial*DataFrame` y sus métodos
-
+Proveedor de las clases `Spatial*` y `Spatial*DataFrame` y sus métodos
 
 ```{r}
 library(sp)
-data(meuse)
+data("meuse")
 coordinates(meuse) <- ~x+y
 proj4string(meuse) <- CRS("+init=epsg:28992")
 meuse
 ```
 
 Slots para: `bbox`, `coords`, `proj4string` y `data` (los que `*DataFrame`
-
 
 ]
 
@@ -274,7 +231,7 @@ render_graph(grafico2)
 
 .pull-right[
 
-`maptools` utilidades varias (discontinuado)
+- `maptools` daba utilidades varias para manejar vectores
 
 ]
 
@@ -291,8 +248,7 @@ grafico3 <- grafico2 |>
   add_node(label = "rgdal") |> 
   add_edge(from = 1, to = 4) |> 
   add_node(label = "raster") |> 
-  add_edge(from = 1, to = 5) |> 
-  set_node_attrs(nodes = 2, node_attr = stype, value = "dashed")
+  add_edge(from = 1, to = 5) 
 render_graph(grafico3)
 ```
 
@@ -300,16 +256,16 @@ render_graph(grafico3)
 
 .pull-right[
 
-`maptools` utilidades varias (discontinuado en )
+- `maptools` daba utilidades varias para manejar vectores 
 
-`rgdal` para leer/guardardatos espaciales
+- `rgdal` para leer/guardar datos espaciales
 
-`rgeos` para operar vectores
+- `rgeos` para operar vectores
 
-`raster` para operar rasters
-
+- `raster` para operar rasters
 
 ]
+
 ---
 template: spatial
 
@@ -317,9 +273,8 @@ template: spatial
 
 ```{r, echo = F}
 # raster spacetime
-grafico4 <- grafico3 |>  
-  add_node(label = "spacetime") |> 
-  add_edge(from = 1, to = 6)
+grafico4 <- grafico3 |>
+  add_node(label = "spacetime") 
 render_graph(grafico4)
 ```
 
@@ -327,7 +282,7 @@ render_graph(grafico4)
 
 .pull-right[
 
-- Otros paquetes para con clases y metodos para objetos tipo raster y espacio-tiempo
+- `spacetime` aporta clases y metodos para datos espacio-temporales
 
 ]
 
@@ -341,34 +296,20 @@ template: spatial
 grafico5 <- grafico4 |>  
   add_node(label = "sf") |> 
   add_edge(from = 3, to = 7) |> 
-  add_edge(from = 4, to = 7) 
+  add_edge(from = 4, to = 7) |> 
+  set_node_attrs(nodes = c(2,3,4), node_attr = style, value = "dashed")
 render_graph(grafico5)
-```
-
-
-```{r, echo = F}
-# stars
-grafico6 <- grafico5 |>  
-  add_node(label = "stars") |> 
-  add_edge(from = 5, to = 8) |> 
-  add_edge(from = 6, to = 8) 
-render_graph(grafico6)
-```
-
-
-```{r, echo = F}
-# terra
-grafico7 <- grafico6 |>  
-  add_node(label = "terra") |> 
-  add_edge(from = 5, to = 9) 
-render_graph(grafico7)
 ```
 
 ]
 
 .pull-right[
 
-Mas texto
+Nueva generación?
+
+- `maptools/rgeos/rgdal` se retiran en Oct 2023
+
+- `sf` (simple feature) evolución de `sp`, combina GEOS y GDAL `tidyverse`-friendly
 
 ]
 
@@ -378,38 +319,24 @@ template: spatial
 .pull-left[
 
 ```{r, echo = F}
-# sf
-grafico5 <- grafico4 |>  
-  add_node(label = "sf") |> 
-  add_edge(from = 3, to = 7) |> 
-  add_edge(from = 4, to = 7) 
-render_graph(grafico5)
-```
-
-
-```{r, echo = F}
 # stars
 grafico6 <- grafico5 |>  
   add_node(label = "stars") |> 
   add_edge(from = 5, to = 8) |> 
-  add_edge(from = 6, to = 8) 
+  add_edge(from = 6, to = 8) |> 
+  add_edge(from = 7, to = 8)
 render_graph(grafico6)
-```
-
-
-```{r, echo = F}
-# terra
-grafico7 <- grafico6 |>  
-  add_node(label = "terra") |> 
-  add_edge(from = 5, to = 9) 
-render_graph(grafico7)
 ```
 
 ]
 
 .pull-right[
 
-Mas texto
+Nueva generación...
+
+- `sf` (simple feature) evolución de `sp`, combina GEOS y GDAL `tidyverse`-friendly
+
+- `stars` vectores y rasters espaciotemporales
 
 ]
 
@@ -419,26 +346,6 @@ template: spatial
 .pull-left[
 
 ```{r, echo = F}
-# sf
-grafico5 <- grafico4 |>  
-  add_node(label = "sf") |> 
-  add_edge(from = 3, to = 7) |> 
-  add_edge(from = 4, to = 7) 
-render_graph(grafico5)
-```
-
-
-```{r, echo = F}
-# stars
-grafico6 <- grafico5 |>  
-  add_node(label = "stars") |> 
-  add_edge(from = 5, to = 8) |> 
-  add_edge(from = 6, to = 8) 
-render_graph(grafico6)
-```
-
-
-```{r, echo = F}
 # terra
 grafico7 <- grafico6 |>  
   add_node(label = "terra") |> 
@@ -450,31 +357,64 @@ render_graph(grafico7)
 
 .pull-right[
 
-Mas texto
+Nueva generación?
+
+- `sf` (simple feature) evolución de `sp`, combina GEOS y GDAL `tidyverse`-friendly
+
+- `stars` vectores y rasters espaciotemporales
+
+- `terra` evolución de `raster``
 
 ]
 
+
 ---
+name: estatico-interact
+
 ## Mapas estáticos vs interactivos
 
-.pull-left[
+```{r, echo = F}
+library(tmap)
+data("World")
+mapamundi <- tm_shape(World) + tm_polygons("continent") 
+```
 
-Al principio sólo podían hacerse mapas estaticos con R.
+---
+template: estatico-interact
 
-```{r}
+```{r, echo = F, fig.width=12}
+tmap_mode("plot") # modo estático
+mapamundi 
+```
 
+---
+template: estatico-interact
+
+```{r, echo = F, out.width="90%"}
+tmap_mode("view") # modo interactivo
+mapamundi
 ```
 
 
-]
-
-
 ---
-### Paquetes para mapear
+## Paquetes para mapear
 
 .pull-left[
 
--   base?
+Se pueden hacer "mapas" usando funciones básicas (y mucho código) o como paquetes dedicados
+
+Algunos paquetes con capacidades para mapear:
+
+- `sp` a través de `spplot()`
+- `sf` usando `plot()`
+- `raster`
+- `ggplot2`, marida con `sf` usando `geom_sf()`
+- `ggspatial`
+- `tmap`, muy completo
+- `mapview`,  
+- `leaflet`,
+- `rbokeh`, un port the paquete `bokeh` de Python
+- ...
 
 ]
 
@@ -482,11 +422,300 @@ Al principio sólo podían hacerse mapas estaticos con R.
 
 .pull-right[
 
+```{r, echo = F, include=T}
+estaticos <- c("sp", "sf", "raster", "ggplot2", "ggspatial", "tmap")
+interactivos <- c("tmap", "leaflet", "mapview", "rbokeh")
+
+# Chart
+x <- list(interactivos = interactivos, estaticos = estaticos)
+ggvenn(x, show_elements = T, label_sep = "\n", text_size= 6)
+```
+
+]
+
+---
+name: spplot
+
+## `sp::spplot()`
+
+---
+template: spplot
+
+.pull-left[
+
+- Usa el paquete `grid` (similar a `lattice`) 
+
+- Soporta vectores y raster como objetos `Spatial*`
+
+- Gráficos y multipanel
+
+- Rápido
+
+- Sintaxis compleja
+
+]
+
+.pull-right[
+
+```{r}
+library(sp)
+
+# Datos punto
+data("meuse")
+coordinates(meuse) <- ~x+y
+proj4string(meuse) <- CRS("+init=epsg:28992")
+
+# Datos raster
+data("meuse.grid")
+coordinates(meuse.grid) = ~x+y
+proj4string(meuse.grid) <- CRS("+init=epsg:28992")
+gridded(meuse.grid) = TRUE
+```
+
+]
+
+---
+template: spplot
+
+.pull-left[
+
+Algo básico...
+
+```{r sp1, eval = F}
+spplot(meuse, zcol = "zinc")
+```
+
+]
+
+--
+
+.pull-right[
+
+```{r ref.label="sp1", eval = T, echo = F}
+```
+
+]
+
+---
+template: spplot
+
+.pull-left[
+
+Algo mejor...
+
+```{r sp2, eval = F}
+spplot(
+  meuse, zcol = "zinc",
+  scales = list(draw = T),     #<<
+  ylab = "Northing (m)",       #<<
+  xlab = "Easting (m)",        #<<
+  key.space = "right"          #<<
+)
+```
+
+]
+
+--
+
+.pull-right[
+
+```{r ref.label="sp2", eval = T, echo = F}
+```
+
+]
+
+---
+template: spplot
+
+.pull-left[
+
+Más de una variable...
+
+```{r sp3, eval = F}
+spplot(
+  meuse, zcol = c("zinc", "lead"), #<<
+  scales = list(draw = T), 
+  ylab = "Northing (m)", xlab = "Easting (m)",
+  key.space = "right"
+)
+```
+
+]
+
+--
+
+.pull-right[
+
+```{r ref.label="sp3", eval = T, echo = F}
+```
+
+]
+
+---
+template: spplot
+
+.pull-left[
+
+Ploteando rasters
+
+```{r sp4, eval = F}
+p1 <- spplot(
+  meuse.grid, zcol= "dist",
+  scales = list(draw = T), key.space = "right",
+  ylab = "Northing (m)", xlab = "Easting (m)"
+)
+p1
+```
+
+]
+
+--
+
+.pull-right[
+
+```{r ref.label="sp4", eval = T, echo = F}
+```
+
+]
+
+---
+template: spplot
+
+.pull-left[
+
+```{r sp5, eval = F}
+p2 <- spplot(
+  meuse.grid, zcol= "ffreq",
+  scales = list(draw = T), key.space = "right",
+  ylab = "Northing (m)", xlab = "Easting (m)"
+)
+p2
+```
+
+]
+
+--
+
+.pull-right[
+
+```{r ref.label="sp5", eval = T, echo = F}
+```
+
 ]
 
 
--   spplot
--   ggplot
--   tmap
--   leaflet
--   Referencias
+---
+template: spplot
+
+Combinando graficos con `gridExtra`
+
+```{r sp6, fig.width=10, fig.retina=2}
+library(gridExtra)
+grid.arrange(p1,p2, ncol = 2)
+```
+
+---
+name: sfplot
+
+## `sf::plot()`
+
+
+---
+template: sfplot
+
+.pull-left[
+
+- Solo para vectores (puntos, lineas, poligonos)
+
+- Muy rápido, ideal para explorar
+
+- Sintaxis similar a `base::plot()`, se agggregan elementos....
+
+```{r sf1, eval = F}
+library(sf)
+meuse_sf <- st_as_sf(meuse)
+plot(meuse_sf)
+```
+
+]
+
+--
+
+.pull-right[
+
+```{r ref.label="sf1", eval = T, echo = F}
+```
+
+]
+
+---
+name: ggsf
+
+## `ggplot2` + `sf`
+
+---
+template: ggsf
+
+.pull-left[
+
+- Vectores (puntos, lineas, poligonos) y rasters
+
+- Sigue la lógica de _grammar of graphics_ 
+
+- `geom_sf()`/`coords_sf()`
+
+```{r ggsf1, eval = F}
+library(sf)
+library(ggplot2)
+meuse_sf <- st_as_sf(meuse)
+meuse_sf2 <- st_transform(meuse_sf,crs = 3857)
+ggplot(meuse_sf2) +
+  aes(color = zinc) +
+  geom_sf() +
+  coord_sf(datum = NULL)
+```
+
+]
+
+--
+
+.pull-right[
+
+```{r ref.label="ggsf1", eval = T, echo = F}
+```
+
+]
+
+---
+template: ggsf
+
+.pull-left[
+
+Podemos usar facets
+
+
+```{r ggsf1, eval = F}
+library(dplyr)
+meuse_sf |> 
+  pivot_longer(cadmium:zinc) |> 
+  ggplot() +
+  aes(color = value) +
+  geom_sf() +
+  coord_sf(datum = NULL) +
+  facet_wrap(~ name)
+```
+
+]
+
+--
+
+.pull-right[
+
+```{r ref.label="ggsf1", eval = T, echo = F}
+```
+
+]
+
+---
+### `tmap`
+
