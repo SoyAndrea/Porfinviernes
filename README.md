@@ -4,7 +4,7 @@ Esta charla forma parte del Ciclo de webinars sobre uso de [**R en agronomía**]
 
 ## Git & GitHub para proyectos colaborativos en R por Andrea Gomez Vargas
 
-- 📺 [Slides](https://github.com/SoyAndrea/Porfinviernes/blob/main/Git%20y%20Github%20-%209%20de%20junio/9.06.2023%20Github%20para%20proyectos%20colaborativos%20en%20R%20.pdf)
+- 📺 [Slides](https://github.com/SoyAndrea/Porfinviernes/blob/main/9.06.2023%20Github%20para%20proyectos%20colaborativos%20en%20R%20.pdf)
 - 📹 [Video](https://youtu.be/4lUyHgYmDqM)
 
 
