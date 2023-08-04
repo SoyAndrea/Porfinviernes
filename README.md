@@ -7,6 +7,6 @@ Ciclo de webinars sobre uso de [**R en agronomía**](https://github.com/RenINTA)
 - 📹 [Video](https://youtu.be/4lUyHgYmDqM)
 
 
-<img src='https://soyandrea.netlify.app/publication/renagro/featured_hu804c6be0e60879cdae4ec787ac45fbf5_220403_720x0_resize_lanczos_2.png' width="500" height="300">
+<img src='https://soyandrea.netlify.app/publication/renagro/featured_hu804c6be0e60879cdae4ec787ac45fbf5_220403_720x0_resize_lanczos_2.png'>
 
 _Este repositorio es parte del taller como ejercicio práctico en vivo._
