@@ -1,8 +1,9 @@
 ---
-title: "Haciendo mapas en R"
+title: "Haciendo mapas con R"
 author: "Dr. Agustín Alesso"
-institute: "Dept. of Crop Sciences | University of Illinois "
-subtitle: "PoRfin VieRnes"
+institute: "ICiagro Litoral | UNL-CONICET"
+subtitle: "Por fin VieRnes"
+date: "11 de Agosto 2023"
 output: 
   xaringan::moon_reader:
     seal: false
@@ -37,7 +38,8 @@ htmltools::tagList(
 
 #Options
 opts_chunk$set(
-  echo = T, comment = NA, warning = FALSE, message = FALSE, fig.align = 'center', cache =F
+  echo = T, comment = NA, warning = FALSE, message = FALSE, fig.align = 'center', cache =F,
+  fig.retina = 2
 )
 options(width = 70)
 tema <- theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
@@ -56,6 +58,9 @@ source(here::here("./mapas_con_R/out_lines.R"))
 
 ### `r rmarkdown::metadata$institute`
 
+<br>
+
+### `r rmarkdown::metadata$date`
 
 ???
 
@@ -64,14 +69,11 @@ source(here::here("./mapas_con_R/out_lines.R"))
 
 .pull-left[
 
--   Por que hacer mapas? y porque en R?
+-   ¿Por qué hacer mapas? ¿por qué con R?
 -   Evolución datos espaciales en R
 -   Mapas estáticos vs interactivos
 -   base?
--   spplot
--   ggplot
--   tmap
--   leaflet
+-   Paquetes para mapear
 -   Referencias
 
 ]
@@ -87,11 +89,14 @@ source(here::here("./mapas_con_R/out_lines.R"))
 
 .small[
 
-Codigo reproducible. You need to install/load these packages before run it.
+Codigo reproducible instalando estos paquetes.
 
 ```{r, eval = F}
 install.packages("pacman")
-pacman::p_load(tidyverse, rio, GGally, car, ggpmisc)
+pacman::p_load(tidyverse, sf, leaflet, tmap, ggspatial)
+
+# Agromet
+remotes::instal_github("AgRoMeteorologiaINTA/agromet")
 ```
 
 Or, you can try out the code using this r # embed_file("intro-to-mlr-notebook.Rmd", text = "R-notebook") `r fontawesome::fa("download")`
@@ -116,7 +121,6 @@ include_graphics("https://upload.wikimedia.org/wikipedia/commons/c/c7/Snow-chole
 
 ???
 
-
 Maps have been used for several thousand years for a wide variety of purposes. Historic examples include maps of buildings and land ownership in the Old Babylonian dynasty more than 3000 years ago and Ptolemy’s world map in his masterpiece Geography nearly 2000 years ago
 
 En uno de los primeros análisis de datos espaciales el Dr. Snow mapeó los casos de cólera en el barrio Soho de Londres y la disposición de las estaciones de bombeo.
@@ -138,24 +142,23 @@ De la visualización de ambas capas de información descubró que el pozo contam
 
 ]
 
+--
 
-???
-
-
-Los mapas permien ver tendencias, patrones, valores extraños, etc
-
-Ejemplo de tendencia
-
-Ejemplo clásico pozos y colera
-
+- **¿Por que en R?** {{content}}
 
 --
 
-`r fontawesome::fa("exclamation-triangle")` **Cuidado**:
+reproducibilidad!
 
-Mapas mal preparados pueden dificultar la comunicacion de resultados. Algunos problemas comunes:
+{{content}}
 
-- mala ubicación de los componnts
+--
+
+<br>
+
+`r fontawesome::fa("exclamation-triangle")` **Cuidado**: Mapas mal preparados pueden dificultar la comunicación.
+
+- mala ubicación de los componentes
 
 - tamaño y legibilidad del texto
 
@@ -167,6 +170,13 @@ Mapas mal preparados pueden dificultar la comunicacion de resultados. Algunos pr
 
 
 ???
+
+
+Los mapas permien ver tendencias, patrones, valores extraños, etc
+
+Ejemplo de tendencia
+
+Ejemplo clásico pozos y colera
 
 ---
 name: spatial
@@ -305,7 +315,7 @@ render_graph(grafico5)
 
 .pull-right[
 
-Nueva generación?
+Nueva generación...
 
 - `maptools/rgeos/rgdal` se retiran en Oct 2023
 
@@ -334,6 +344,8 @@ render_graph(grafico6)
 
 Nueva generación...
 
+- `maptools/rgeos/rgdal` se retiran en Oct 2023
+
 - `sf` (simple feature) evolución de `sp`, combina GEOS y GDAL `tidyverse`-friendly
 
 - `stars` vectores y rasters espaciotemporales
@@ -357,13 +369,15 @@ render_graph(grafico7)
 
 .pull-right[
 
-Nueva generación?
+Nueva generación...
+
+- `maptools/rgeos/rgdal` se retiran en Oct 2023
 
 - `sf` (simple feature) evolución de `sp`, combina GEOS y GDAL `tidyverse`-friendly
 
 - `stars` vectores y rasters espaciotemporales
 
-- `terra` evolución de `raster``
+- `terra` evolución de `raster`
 
 ]
 
@@ -487,8 +501,6 @@ spplot(meuse, zcol = "zinc")
 
 ]
 
---
-
 .pull-right[
 
 ```{r ref.label="sp1", eval = T, echo = F}
@@ -506,16 +518,15 @@ Algo mejor...
 ```{r sp2, eval = F}
 spplot(
   meuse, zcol = "zinc",
-  scales = list(draw = T),     #<<
-  ylab = "Northing (m)",       #<<
-  xlab = "Easting (m)",        #<<
-  key.space = "right"          #<<
+  cuts = seq(0,2000, by = 250), #<<
+  scales = list(draw = T),      #<<
+  ylab = "Northing (m)",        #<<
+  xlab = "Easting (m)",         #<<
+  key.space = "right"           #<<
 )
 ```
 
 ]
-
---
 
 .pull-right[
 
@@ -583,6 +594,9 @@ template: spplot
 
 .pull-left[
 
+Ploteando rasters
+
+
 ```{r sp5, eval = F}
 p2 <- spplot(
   meuse.grid, zcol= "ffreq",
@@ -609,9 +623,9 @@ template: spplot
 
 Combinando graficos con `gridExtra`
 
-```{r sp6, fig.width=10, fig.retina=2}
+```{r sp6, fig.width=12, fig.retina=2}
 library(gridExtra)
-grid.arrange(p1,p2, ncol = 2)
+grid.arrange(p1, p2, ncol = 2)
 ```
 
 ---
@@ -625,11 +639,11 @@ template: sfplot
 
 .pull-left[
 
-- Solo para vectores (puntos, lineas, poligonos)
+- Sólo para vectores (puntos, lineas, poligonos, etc)
 
 - Muy rápido, ideal para explorar
 
-- Sintaxis similar a `base::plot()`, se agggregan elementos....
+- Sintaxis similar a `base::plot()`, se agregan elementos....
 
 ```{r sf1, eval = F}
 library(sf)
@@ -651,7 +665,7 @@ plot(meuse_sf)
 ---
 name: ggsf
 
-## `ggplot2` + `sf`
+## `ggplot2` + `sf` + `ggspatial`
 
 ---
 template: ggsf
@@ -664,15 +678,16 @@ template: ggsf
 
 - `geom_sf()`/`coords_sf()`
 
+- `ggspatial` permite agregar mapa base, escalas, etc.
+
 ```{r ggsf1, eval = F}
 library(sf)
 library(ggplot2)
 meuse_sf <- st_as_sf(meuse)
-meuse_sf2 <- st_transform(meuse_sf,crs = 3857)
-ggplot(meuse_sf2) +
+ggplot(meuse_sf) +
   aes(color = zinc) +
-  geom_sf() +
-  coord_sf(datum = NULL)
+  geom_sf() +            #<<
+  coord_sf(datum = NULL) #<<
 ```
 
 ]
@@ -691,18 +706,345 @@ template: ggsf
 
 .pull-left[
 
+- Vectores (puntos, lineas, poligonos) y rasters
+
+- Sigue la lógica de _grammar of graphics_ 
+
+- `geom_sf()`/`coords_sf()`
+
+- `ggspatial` permite agregar mapa base, escalas, etc.
+
+```{r ggsf2, eval = F}
+library(ggspatial)
+ggplot(meuse_sf) +
+  annotation_map_tile("osm", zoomin = 0) +  #<<
+  aes(color = zinc) +
+  geom_sf() +
+  coord_sf()   #<<
+```
+
+]
+
+--
+
+.pull-right[
+
+```{r ref.label="ggsf2", eval = T, echo = F}
+```
+
+]
+
+---
+template: ggsf
+
+.pull-left[
+
 Podemos usar facets
 
-
-```{r ggsf1, eval = F}
+```{r ggsf3, eval = F}
 library(dplyr)
 meuse_sf |> 
   pivot_longer(cadmium:zinc) |> 
   ggplot() +
   aes(color = value) +
   geom_sf() +
-  coord_sf(datum = NULL) +
   facet_wrap(~ name)
+```
+
+]
+
+--
+
+.pull-right[
+
+```{r ref.label="ggsf32", eval = T, echo = F}
+```
+
+]
+
+---
+template: ggsf
+
+.pull-left[
+
+O `patchwork` para tener una escala por panel...
+
+```{r ggsf4, eval = F}
+p_base <- ggplot(meuse_sf) + geom_sf() + theme_bw()
+p_zinc <- p_base + aes(color = zinc) 
+p_lead <- p_base +aes(color = lead)
+p_cadmium <- p_base + aes(color = cadmium) 
+p_copper <- p_base + aes(color = copper)
+
+library(patchwork)
+(p_zinc + p_cadmium) /(p_copper + p_lead)
+```
+
+]
+
+.pull-right[
+
+```{r ref.label="ggsf4", eval = T, echo = F}
+```
+
+]
+
+---
+name: tmap
+
+## `tmap`
+
+---
+template: tmap
+
+.pull-left[
+
+- Vectores (puntos, lineas, poligonos) y rasters
+
+- Sigue la lógica de _grammar of graphics_ 
+
+- Mapas estáticos y dinámicos (leaflet)
+
+- `tm_shape()` es la base que define el set de datos, luego `+ tm_*` agregan capas 
+
+- El orden de los factorers altera el producto
+
+```{r tm1, eval = F}
+library(tmap)
+library(agromet)
+tmap_mode("plot") # modo estático, "view" para dinámico
+
+# Poligonos usando Agromet
+provs <- mapa_provincias()
+dptos <- mapa_departamentos()
+
+mapa_base <- tm_shape(provs) +
+  tm_borders()
+mapa_base
+```
+
+]
+
+--
+
+.pull-right[
+
+```{r ref.label="tm1", eval = T, echo = F}
+```
+
+]
+
+
+---
+template: tmap
+
+.pull-left[
+
+Agregando los estaciones con `tm_dots()`
+
+```{r tm2, eval = F}
+estaciones <- metadatos_nh() |>
+  st_as_sf(coords = c("lon", "lat")) |> 
+  st_set_crs(4326)
+colores <- c(INTA = "blue", SMN = "red")
+
+mapa_est_org <- tm_shape(estaciones) +
+  tm_dots("organismo", palette = colores) +
+  tm_layout(legend.outside = T)
+
+mapa_base + mapa_est_org
+```
+
+]
+
+--
+
+.pull-right[
+
+```{r ref.label="tm2", eval = T, echo = F}
+```
+
+]
+
+---
+template: tmap
+
+.pull-left[
+
+Un ejemplo con escala numérica...
+
+```{r tm3, eval = F}
+mapa_est_alt <- tm_shape(estaciones) +
+  tm_bubbles("altura") +
+  tm_layout(legend.outside = T)
+
+mapa_base + mapa_est_alt
+```
+
+]
+
+--
+
+.pull-right[
+
+```{r ref.label="tm3", eval = T, echo = F}
+```
+
+]
+
+---
+template: tmap
+
+.pull-left[
+
+Y ambas a la vesz?...
+
+```{r tm4, eval = F}
+mapa_est_alt_org <- tm_shape(estaciones) +
+  tm_bubbles("altura", col = "organismo", palette = colores) +
+  tm_layout(legend.outside = T)
+
+mapa_base + mapa_est_alt_org
+```
+
+]
+
+--
+
+.pull-right[
+
+```{r ref.label="tm4", eval = T, echo = F}
+```
+
+]
+
+---
+template: tmap
+
+.pull-left[
+
+Podemos usar facets... 
+
+```{r tm5, eval = F}
+provincias <- c("Buenos Aires", "Santa Fe", "Córdoba")
+
+tm_shape(provs |> filter(name %in% provincias)) +
+  tm_borders() +
+  tm_facets("name") + #<<
+tm_shape(estaciones |> filter(provincia %in% provincias)) +
+  tm_dots("organismo", size = 0.25, palette = colores) +
+  tm_facets("provincia", ncol = 1) #<<
+```
+
+]
+
+--
+
+.pull-right[
+
+```{r ref.label="tm5", eval = T, echo = F}
+```
+
+]
+
+---
+template: tmap
+
+.pull-left[
+
+Para agregar elementos adicionales
+
+- `tm_graticule()` para grilla coordenadas, permite reproyectar
+
+- `tm_compass()` para rosa
+
+- `tm_scalebar()` para escala
+
+- `tm_layout()` títulos, etc.
+
+```{r tm6, eval = F}
+mapa_base + 
+  mapa_est_org +
+  tm_graticules() +
+  tm_compass(type = "arrow", size = 2, position = c("left","top")) +
+  tm_scale_bar() +
+  tm_layout(main.title = "Estaciones NH", main.title.size = 1)
+```
+
+]
+
+--
+
+.pull-right[
+
+```{r ref.label="tm6", eval = T, echo = F}
+```
+
+]
+
+---
+template: tmap
+
+.pull-left[
+
+También podemos hacer mapas dentro de mapas usando `grid::viewport()`
+
+```{r tm7, eval = F}
+# Mapa principal
+mapa_bsas <- tm_shape(provs |> filter(name == "Buenos Aires")) +
+  tm_borders() +
+  tm_shape(estaciones |> filter(provincia == "Buenos Aires")) +
+  tm_dots("organismo", size = 0.05, palette = colores) +
+  tm_text("estacion", size = 0.75, ymod = 0.5, remove.overlap = T) + #<<
+  tm_layout(frame = F)
+
+# Minimapa
+provs <- mutate(provs, foco = ifelse(name == "Buenos Aires", "gray", "white"))
+mapa_arg <- tm_shape(provs) +
+  tm_polygons("foco")
+
+# Imprimir mapa principal y submapa
+mapa_bsas #<<
+print(mapa_arg, vp = grid::viewport(x = 0.9, y = 0.2, width = 0.3, height = 0.3)) #<<
+```
+
+]
+
+--
+
+.pull-right[
+
+```{r ref.label="tm7", eval = T, echo = F}
+```
+
+]
+
+--- 
+name: mapview
+
+## `mapview`
+
+---
+template: mapview
+
+.pull-left[
+
+- Vectores (puntos, líneas, polígonos) y rasters
+
+- Sigue la lógica de _grammar of graphics_ 
+
+- `geom_sf()`/`coords_sf()`
+
+- `ggspatial` permite agregar mapa base, escalas, etc.
+
+```{r mpaview, eval = F}
+library(sf)
+library(ggplot2)
+meuse_sf <- st_as_sf(meuse)
+ggplot(meuse_sf) +
+  aes(color = zinc) +
+  geom_sf() +            #<<
+  coord_sf(datum = NULL) #<<
 ```
 
 ]
@@ -717,5 +1059,40 @@ meuse_sf |>
 ]
 
 ---
-### `tmap`
+name: leaflet
 
+## `leaflet`
+
+---
+template: ggsf
+
+.pull-left[
+
+- Vectores (puntos, lineas, poligonos) y rasters
+
+- Sigue la lógica de _grammar of graphics_ 
+
+- `geom_sf()`/`coords_sf()`
+
+- `ggspatial` permite agregar mapa base, escalas, etc.
+
+```{r ggsf1, eval = F}
+library(sf)
+library(ggplot2)
+meuse_sf <- st_as_sf(meuse)
+ggplot(meuse_sf) +
+  aes(color = zinc) +
+  geom_sf() +            #<<
+  coord_sf(datum = NULL) #<<
+```
+
+]
+
+--
+
+.pull-right[
+
+```{r ref.label="ggsf1", eval = T, echo = F}
+```
+
+]
