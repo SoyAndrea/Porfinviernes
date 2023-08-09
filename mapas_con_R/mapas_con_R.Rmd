@@ -1,9 +1,7 @@
 ---
 title: "Haciendo mapas con R"
 author: "Dr. Agustín Alesso"
-institute: "ICiagro Litoral | UNL-CONICET"
-subtitle: "Por fin VieRnes"
-date: "11 de Agosto 2023"
+subtitle: "Por fin VieRnes | 11 de Agosto 2023"
 output: 
   xaringan::moon_reader:
     seal: false
@@ -18,9 +16,7 @@ output:
 editor_options: 
   chunk_output_type: inline
 ---
-class: title-slide, middle, hide-count, inverse
-background-size: 15%
-background-position: 10% 90%
+class: title-slide, middle, hide-count
 
 ```{r setup, include=FALSE}
 #Packages
@@ -48,15 +44,15 @@ tema <- theme(panel.grid.major = element_blank(), panel.grid.minor = element_bla
 source(here::here("./mapas_con_R/out_lines.R"))
 ```
 
+### `r rmarkdown::metadata$subtitle`
+
 # `r rmarkdown::metadata$title`
 
 <br>
 
 ## `r rmarkdown::metadata$author`
-  
-### `r rmarkdown::metadata$subtitle`
 
-### `r rmarkdown::metadata$institute`
+<br>
 
 <br>
 
@@ -72,9 +68,7 @@ source(here::here("./mapas_con_R/out_lines.R"))
 -   ¿Por qué hacer mapas? ¿por qué con R?
 -   Evolución datos espaciales en R
 -   Mapas estáticos vs interactivos
--   base?
 -   Paquetes para mapear
--   Referencias
 
 ]
 
@@ -89,17 +83,18 @@ source(here::here("./mapas_con_R/out_lines.R"))
 
 .small[
 
-Codigo reproducible instalando estos paquetes.
+Código reproducible instalando estos paquetes.
 
 ```{r, eval = F}
-install.packages("pacman")
-pacman::p_load(tidyverse, sf, leaflet, tmap, ggspatial)
+pkgs <- c("tidyverse", "patchwork", "sf", "sp", "leaflet",
+          "mapview", "tmap", "ggspatial", "gridExtra")
+install.packages(pkgs)
 
 # Agromet
 remotes::instal_github("AgRoMeteorologiaINTA/agromet")
 ```
 
-Or, you can try out the code using this r # embed_file("intro-to-mlr-notebook.Rmd", text = "R-notebook") `r fontawesome::fa("download")`
+O, probar el codigo siguiendo este r # embed_file("intro-to-mlr-notebook.Rmd", text = "R-notebook") `r fontawesome::fa("download")`
 
 ]
 
@@ -107,9 +102,12 @@ Or, you can try out the code using this r # embed_file("intro-to-mlr-notebook.Rm
 
 
 ---
-name: why-MLR
+name: why
 
 ## ¿Por qué hacer mapas?
+
+---
+template: why
 
 .pull-left[
 
@@ -144,7 +142,7 @@ De la visualización de ambas capas de información descubró que el pozo contam
 
 --
 
-- **¿Por que en R?** {{content}}
+**¿Por que en R?** {{content}}
 
 --
 
@@ -200,7 +198,7 @@ include_graphics(c("https://avatars.githubusercontent.com/u/520851?v=4", "https:
 
 ```{r, echo = F, out.width="30%", fig.align="center"}
 # solo sp
-grafico1 <- create_graph(attr_theme = "tb") |> 
+grafico1 <- create_graph(attr_theme = "tb") |>
   add_node(label = "sp")
 render_graph(grafico1)
 ```
@@ -241,7 +239,7 @@ render_graph(grafico2)
 
 .pull-right[
 
-- `maptools` daba utilidades varias para manejar vectores
+- `maptools` da utilidades varias para manejar vectores
 
 ]
 
@@ -254,7 +252,7 @@ template: spatial
 # sp rgeos/gdal
 grafico3 <- grafico2 |>  
   add_node(label = "rgeos") |> 
-  add_edge(from = 1, to = 3) |> 
+  add_edge(from = 1, to = 3, ) |> 
   add_node(label = "rgdal") |> 
   add_edge(from = 1, to = 4) |> 
   add_node(label = "raster") |> 
@@ -284,13 +282,22 @@ template: spatial
 ```{r, echo = F}
 # raster spacetime
 grafico4 <- grafico3 |>
-  add_node(label = "spacetime") 
+  add_node(label = "spacetime") |> 
+  add_global_graph_attrs(attr = "rank", value = "same; 1;6;", attr_type = "graph")
 render_graph(grafico4)
 ```
 
 ]
 
 .pull-right[
+
+- `maptools` daba utilidades varias para manejar vectores 
+
+- `rgdal` para leer/guardar datos espaciales
+
+- `rgeos` para operar vectores
+
+- `raster` para operar rasters
 
 - `spacetime` aporta clases y metodos para datos espacio-temporales
 
@@ -334,7 +341,10 @@ grafico6 <- grafico5 |>
   add_node(label = "stars") |> 
   add_edge(from = 5, to = 8) |> 
   add_edge(from = 6, to = 8) |> 
-  add_edge(from = 7, to = 8)
+  add_edge(from = 7, to = 8) |> 
+  add_global_graph_attrs(attr = "rank", value = "same; 5;8;", attr_type = "graph")
+
+  
 render_graph(grafico6)
 ```
 
@@ -450,26 +460,32 @@ ggvenn(x, show_elements = T, label_sep = "\n", text_size= 6)
 ---
 name: spplot
 
-## `sp::spplot()`
+## `sp`
 
 ---
 template: spplot
 
 .pull-left[
 
-- Usa el paquete `grid` (similar a `lattice`) 
+- `sp::plot()` usa plot base para objetos espaciales
 
-- Soporta vectores y raster como objetos `Spatial*`
+- `sp::spplot()` usa el paquete `grid` (similar a `lattice`) 
 
-- Gráficos y multipanel
+- Soportan vectores y raster como objetos `Spatial*`
 
-- Rápido
+- Son rápidos
 
 - Sintaxis compleja
 
+- `sp::spplot()` gráficos multipanel
+
 ]
 
+--
+
 .pull-right[
+
+Preparando unos datos para probar...
 
 ```{r}
 library(sp)
@@ -493,17 +509,24 @@ template: spplot
 
 .pull-left[
 
-Algo básico...
+Algo básico con `sp::plot()`...
 
-```{r sp1, eval = F}
-spplot(meuse, zcol = "zinc")
+```{r, out.width="80%"}
+labs <- cut(meuse$zinc, 5) |> unique()
+cols <- palette.colors(nlevels(labs))
+plot(meuse, axes = T, col = cols, pch = 1)
+legend("topleft", legend = labs, pch = 1, col = cols)
 ```
-
 ]
+
+--
 
 .pull-right[
 
-```{r ref.label="sp1", eval = T, echo = F}
+Lo mismo con `sp::spplot()`...
+
+```{r, out.width="80%"}
+spplot(meuse, zcol = "zinc", scales= list(draw =T))
 ```
 
 ]
@@ -518,11 +541,11 @@ Algo mejor...
 ```{r sp2, eval = F}
 spplot(
   meuse, zcol = "zinc",
+  scales = list(draw = T),      
   cuts = seq(0,2000, by = 250), #<<
-  scales = list(draw = T),      #<<
-  ylab = "Northing (m)",        #<<
-  xlab = "Easting (m)",         #<<
-  key.space = "right"           #<<
+  key.space = "right",           #<<
+  ylab = "Northing (m)",        
+  xlab = "Easting (m)"      
 )
 ```
 
@@ -546,14 +569,13 @@ Más de una variable...
 spplot(
   meuse, zcol = c("zinc", "lead"), #<<
   scales = list(draw = T), 
-  ylab = "Northing (m)", xlab = "Easting (m)",
-  key.space = "right"
+  ylab = "Northing (m)", 
+  xlab = "Easting (m)",
+  key.space = "bottom"
 )
 ```
 
 ]
-
---
 
 .pull-right[
 
@@ -572,15 +594,15 @@ Ploteando rasters
 ```{r sp4, eval = F}
 p1 <- spplot(
   meuse.grid, zcol= "dist",
-  scales = list(draw = T), key.space = "right",
-  ylab = "Northing (m)", xlab = "Easting (m)"
+  scales = list(draw = T), 
+  ylab = "Northing (m)", 
+  xlab = "Easting (m)",
+  at = seq(0, 1, by = 0.05) #<<
 )
 p1
 ```
 
 ]
-
---
 
 .pull-right[
 
@@ -600,15 +622,14 @@ Ploteando rasters
 ```{r sp5, eval = F}
 p2 <- spplot(
   meuse.grid, zcol= "ffreq",
-  scales = list(draw = T), key.space = "right",
-  ylab = "Northing (m)", xlab = "Easting (m)"
+  scales = list(draw = T), 
+  ylab = "Northing (m)",
+  xlab = "Easting (m)"
 )
 p2
 ```
 
 ]
-
---
 
 .pull-right[
 
@@ -623,7 +644,7 @@ template: spplot
 
 Combinando graficos con `gridExtra`
 
-```{r sp6, fig.width=12, fig.retina=2}
+```{r sp6, fig.width=12, fig.height  =5, fig.retina=2}
 library(gridExtra)
 grid.arrange(p1, p2, ncol = 2)
 ```
@@ -645,6 +666,7 @@ template: sfplot
 
 - Sintaxis similar a `base::plot()`, se agregan elementos....
 
+
 ```{r sf1, eval = F}
 library(sf)
 meuse_sf <- st_as_sf(meuse)
@@ -652,8 +674,6 @@ plot(meuse_sf)
 ```
 
 ]
-
---
 
 .pull-right[
 
@@ -680,6 +700,7 @@ template: ggsf
 
 - `ggspatial` permite agregar mapa base, escalas, etc.
 
+
 ```{r ggsf1, eval = F}
 library(sf)
 library(ggplot2)
@@ -690,9 +711,8 @@ ggplot(meuse_sf) +
   coord_sf(datum = NULL) #<<
 ```
 
-]
 
---
+]
 
 .pull-right[
 
@@ -725,7 +745,6 @@ ggplot(meuse_sf) +
 
 ]
 
---
 
 .pull-right[
 
@@ -746,6 +765,7 @@ library(dplyr)
 meuse_sf |> 
   pivot_longer(cadmium:zinc) |> 
   ggplot() +
+  annotation_map_tile("osm", zoomin = 0) +  #<<
   aes(color = value) +
   geom_sf() +
   facet_wrap(~ name)
@@ -753,11 +773,9 @@ meuse_sf |>
 
 ]
 
---
-
 .pull-right[
 
-```{r ref.label="ggsf32", eval = T, echo = F}
+```{r ref.label="ggsf3", eval = T, echo = F}
 ```
 
 ]
@@ -770,7 +788,9 @@ template: ggsf
 O `patchwork` para tener una escala por panel...
 
 ```{r ggsf4, eval = F}
-p_base <- ggplot(meuse_sf) + geom_sf() + theme_bw()
+p_base <- ggplot(meuse_sf) +
+  annotation_map_tile("osm", zoomin = 0) +  #<<
+  geom_sf() + theme_bw()
 p_zinc <- p_base + aes(color = zinc) 
 p_lead <- p_base +aes(color = lead)
 p_cadmium <- p_base + aes(color = cadmium) 
@@ -809,6 +829,7 @@ template: tmap
 
 - El orden de los factorers altera el producto
 
+
 ```{r tm1, eval = F}
 library(tmap)
 library(agromet)
@@ -824,8 +845,6 @@ mapa_base
 ```
 
 ]
-
---
 
 .pull-right[
 
@@ -857,8 +876,6 @@ mapa_base + mapa_est_org
 
 ]
 
---
-
 .pull-right[
 
 ```{r ref.label="tm2", eval = T, echo = F}
@@ -883,8 +900,6 @@ mapa_base + mapa_est_alt
 
 ]
 
---
-
 .pull-right[
 
 ```{r ref.label="tm3", eval = T, echo = F}
@@ -897,19 +912,18 @@ template: tmap
 
 .pull-left[
 
-Y ambas a la vesz?...
+Y ambas a la vez?...
 
 ```{r tm4, eval = F}
 mapa_est_alt_org <- tm_shape(estaciones) +
-  tm_bubbles("altura", col = "organismo", palette = colores) +
+  tm_bubbles("altura", col = "organismo",
+             palette = colores) +
   tm_layout(legend.outside = T)
 
 mapa_base + mapa_est_alt_org
 ```
 
 ]
-
---
 
 .pull-right[
 
@@ -928,10 +942,12 @@ Podemos usar facets...
 ```{r tm5, eval = F}
 provincias <- c("Buenos Aires", "Santa Fe", "Córdoba")
 
-tm_shape(provs |> filter(name %in% provincias)) +
+provs |> filter(name %in% provincias) |> 
+  tm_shape() +
   tm_borders() +
   tm_facets("name") + #<<
-tm_shape(estaciones |> filter(provincia %in% provincias)) +
+estaciones |> filter(provincia %in% provincias) |> 
+  tm_shape() +
   tm_dots("organismo", size = 0.25, palette = colores) +
   tm_facets("provincia", ncol = 1) #<<
 ```
@@ -966,9 +982,15 @@ Para agregar elementos adicionales
 mapa_base + 
   mapa_est_org +
   tm_graticules() +
-  tm_compass(type = "arrow", size = 2, position = c("left","top")) +
+  tm_compass(
+    type = "arrow", size = 2, 
+    position = c("left","top")
+  ) +
   tm_scale_bar() +
-  tm_layout(main.title = "Estaciones NH", main.title.size = 1)
+  tm_layout(
+    main.title = "Estaciones NH", 
+    main.title.size = 1
+  )
 ```
 
 ]
@@ -991,21 +1013,24 @@ También podemos hacer mapas dentro de mapas usando `grid::viewport()`
 
 ```{r tm7, eval = F}
 # Mapa principal
-mapa_bsas <- tm_shape(provs |> filter(name == "Buenos Aires")) +
+mapa_bsas <- provs |> filter(name == "Buenos Aires") |> 
+  tm_shape() +
   tm_borders() +
-  tm_shape(estaciones |> filter(provincia == "Buenos Aires")) +
+  estaciones |> filter(provincia == "Buenos Aires") |> 
+  tm_shape() +
   tm_dots("organismo", size = 0.05, palette = colores) +
   tm_text("estacion", size = 0.75, ymod = 0.5, remove.overlap = T) + #<<
   tm_layout(frame = F)
 
 # Minimapa
-provs <- mutate(provs, foco = ifelse(name == "Buenos Aires", "gray", "white"))
+provs <- provs |> mutate(foco = ifelse(name == "Buenos Aires", "gray", "white"))
 mapa_arg <- tm_shape(provs) +
   tm_polygons("foco")
 
 # Imprimir mapa principal y submapa
-mapa_bsas #<<
-print(mapa_arg, vp = grid::viewport(x = 0.9, y = 0.2, width = 0.3, height = 0.3)) #<<
+mapa_bsas 
+vp <- grid::viewport(x = 0.9, y = 0.2, width = 0.3, height = 0.3) #<<
+print(mapa_arg, vp = vp) #<<
 ```
 
 ]
@@ -1019,33 +1044,27 @@ print(mapa_arg, vp = grid::viewport(x = 0.9, y = 0.2, width = 0.3, height = 0.3)
 
 ]
 
---- 
-name: mapview
-
-## `mapview`
-
 ---
-template: mapview
+template: tmap
 
 .pull-left[
 
-- Vectores (puntos, líneas, polígonos) y rasters
+Podemos alternar entre mapas estáticos/dinámicos definiendo el modo
 
-- Sigue la lógica de _grammar of graphics_ 
+`tmap_mode( mode = c("plot", "view"))`
 
-- `geom_sf()`/`coords_sf()`
+y usar `tm_view()` para controlar argumentos de `leaflet`
 
-- `ggspatial` permite agregar mapa base, escalas, etc.
-
-```{r mpaview, eval = F}
-library(sf)
-library(ggplot2)
-meuse_sf <- st_as_sf(meuse)
-ggplot(meuse_sf) +
-  aes(color = zinc) +
-  geom_sf() +            #<<
-  coord_sf(datum = NULL) #<<
+```{r tm8, eval = F}
+tmap_mode("view")
+mapa_est_org + 
+  tm_view(
+    view.legend.position = c("right", "bottom"),
+    set.view = 4             # mas grande mas zoom
+  ) # mas grande mas zoom
+# tmap_mode("plot") # para volver 
 ```
+
 
 ]
 
@@ -1053,7 +1072,69 @@ ggplot(meuse_sf) +
 
 .pull-right[
 
-```{r ref.label="ggsf1", eval = T, echo = F}
+```{r ref.label="tm8", eval = T, echo = F}
+```
+
+]
+
+
+---
+name: mpvw
+
+## `mapview`
+
+---
+template: mpvw
+
+.pull-left[
+
+- Vectores (puntos, líneas, polígonos) y rasters, spacetime
+
+- Sólo mapas interactivos
+
+- Sintaxis super simple, parecida a spplot
+
+- Controles automaticos (activar/desactivar capas, mapa base, zoom, atributos)
+
+- Ideal para explorar!
+
+```{r mv1, eval = F}
+library(mapview)
+mapview(meuse_sf, zcol = "zinc")
+```
+
+]
+
+.pull-right[
+
+```{r ref.label="mv1", eval = T, echo = F}
+```
+
+]
+
+---
+template: mpvw
+
+.pull-left[
+
+- Se pueden poner varias capas a la vez
+
+- Controla opacidad, mapa base, etc.
+
+
+```{r mv2, eval = F}
+mapviewOptions(basemaps = "Esri.WorldImagery")
+pts <- mapview(meuse_sf, zcol = c("zinc", "lead"))
+rst <- mapview(meuse.grid, zcol = c("dist"), alpha = 0.5)
+rst + pts  
+```
+
+
+]
+
+.pull-right[
+
+```{r ref.label="mv2", eval = T, echo = F}
 ```
 
 ]
@@ -1064,35 +1145,118 @@ name: leaflet
 ## `leaflet`
 
 ---
-template: ggsf
+template: leaflet
 
 .pull-left[
 
-- Vectores (puntos, lineas, poligonos) y rasters
+- Vectores (puntos, lineas, poligonos) `sp` o `sf`
 
-- Sigue la lógica de _grammar of graphics_ 
+- Sigue la lógica de _grammar of graphics_ (capas) 
 
-- `geom_sf()`/`coords_sf()`
+- Sólo graficos dinámicos, pensado para webs.
 
-- `ggspatial` permite agregar mapa base, escalas, etc.
+- Sintaxis un poco más compleja, control mas fino
 
-```{r ggsf1, eval = F}
-library(sf)
-library(ggplot2)
-meuse_sf <- st_as_sf(meuse)
-ggplot(meuse_sf) +
-  aes(color = zinc) +
-  geom_sf() +            #<<
-  coord_sf(datum = NULL) #<<
+```{r lf1, eval = F}
+library(leaflet)
+leaflet(estaciones) |>  
+  addCircles() 
 ```
 
 ]
-
---
 
 .pull-right[
 
-```{r ref.label="ggsf1", eval = T, echo = F}
+```{r ref.label="lf1", eval = T, echo = F}
 ```
 
 ]
+
+---
+template: leaflet
+
+.pull-left[
+
+Podemos agregar capas con `add*()`
+
+- `add*Tiles()` para mapas base provedores y servidores WMS 
+
+- `add*Markers()` para puntos de ubicacion (etiquetas, simbolos, círculos)
+
+- `addPolygons()/addPolylines()` para capas de polígonos y lineas
+
+- `addCircles()/addRectangles()` geometrias
+
+- `addPopups()/addLabels()` etiquetas o callouts
+
+```{r lf2, eval = F}
+library(leaflet)
+leaflet() |>  
+  addProviderTiles(provider = "Esri.WorldImagery") |> 
+  addCircles(data = estaciones) |> 
+  addMarkers(lat = -31.440157, lng = -60.940639, popup = "Acá estoy") |>
+  addPolygons(data = provs, fill = NA, color = "white", weight =  0.5) 
+```
+
+]
+
+.pull-right[
+
+```{r ref.label="lf2", eval = T, echo = F}
+```
+
+]
+
+---
+template: leaflet
+
+.pull-left[
+
+- Los marcadores se pueden agrupar según el zoom, 
+
+- Los elementos se pueden mapear atributos a color, forma, etc. usando paletas: `color*()`,     
+
+```{r lf3, eval = F}
+# definir paleta
+pal <- colorFactor(c("red", "blue"), domain = c("INTA", "SMN"))
+
+# Mapa
+leaflet(estaciones) |>  
+  addProviderTiles(provider = "Esri.WorldImagery") |> 
+  addCircleMarkers(
+    data = estaciones, 
+    fillColor = ~ pal(organismo),
+    color = "transparent",
+    fillOpacity = 1,
+    clusterOptions = markerClusterOptions() # <<
+  ) |> # <<
+  addMarkers(lat = -31.440157, lng = -60.940639, popup = "Acá estoy") |>
+  addPolygons(data = provs, fill = NA, color = "white", weight =  0.5) |> 
+  addLegend(data = estaciones, "bottomright", pal = pal, values = ~ organismo)
+```
+
+]
+
+.pull-right[
+
+```{r ref.label="lf3", eval = T, echo = F}
+```
+
+]
+
+---
+
+## Comentarios finales
+
+- Un mapa es la visualizacion por defecto de datos espaciales.
+
+- En **R** podemos hacer mapas de manera reproducible
+
+- El ecosistema de librerías está cambiando rápido.
+
+- 
+
+---
+class: center, middle
+
+# Gracias

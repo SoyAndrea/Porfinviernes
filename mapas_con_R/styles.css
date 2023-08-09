@@ -27,19 +27,15 @@ a, a > code {
   color: #f3f3f3;
 }
 
-/*
-.logo {
-  background-image: url("logo_FCA.png");
-  background-size: contain;
-  background-repeat: no-repeat;
-  position: absolute;
-  bottom: 1em;
-  left: 1em;
-  width: 180px;
-  height: 40px;
-  z-index: 0;
+.title-slide {
+  background-image: url("logo_FCA.png"),
+                    url("ICIAGRO-LITORAL-UNL.png"),
+                    url("1920px-Physical_map_NE.jpg");
+  background-size: 15%,15%, cover;
+  background-position: 10% 75%, 15% 90%, center;
+  background-color: gray, gray, gray;
 }
-*/
+
 
 .remark-slide-number {
   display: none;
@@ -106,9 +102,10 @@ th, td {
 
 /* H1 fonts  */
 .title-slide h1 {
-  color: #ffffff;
-  font-weight: normal;
-  font-size: 45px;
+  color: black;
+  text-shadow: 0 0 20px #333;
+  font-weight: bold;
+  font-size: 55px;
   padding: 20px;
   text-align: left;
   vertical-align: middle;
@@ -117,7 +114,8 @@ th, td {
 
 /* H2 fonts */
 .title-slide h2 {
-  color: #ffffff;
+  color: black;
+  text-shadow: 0 0 20px #333;
   font-size: 35px;
   padding-left: 20px;
   padding-bottom: 10px;
@@ -128,9 +126,10 @@ th, td {
 
 /* H3 fonts */
 .title-slide h3 {
+  color: black;
+  text-shadow: 0 0 20px #333;
   font-size: 28px;
   font-weight: normal;
-  color: #ffffff;
   padding-left: 20px;
   margin: 0px;
   line-height: 1;
