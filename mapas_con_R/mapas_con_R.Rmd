@@ -20,7 +20,12 @@ class: title-slide, middle, hide-count
 
 ```{r setup, include=FALSE}
 #Packages
-pacman::p_load(knitr, tidyverse, patchwork, xfun, tmap, leaflet, sp, DiagrammeR, ggvenn)
+pacman::p_load(
+  knitr, tidyverse, patchwork, xfun, DiagrammeR, ggvenn, gridExtra,
+  tmap, leaflet, sp, sf, mapview
+)
+pacman::p_install_gh("AgRoMeteorologiaINTA/agromet")
+
 xaringanExtra::use_tile_view()
 # xaringanExtra::use_clipboard()
 
@@ -79,19 +84,20 @@ source(here::here("./mapas_con_R/out_lines.R"))
 .pull-right[
 
 <br><br><br><br><br>
-<br><br><br><br><br>
 
 .small[
 
 Código reproducible instalando estos paquetes.
 
 ```{r, eval = F}
-pkgs <- c("tidyverse", "patchwork", "sf", "sp", "leaflet",
-          "mapview", "tmap", "ggspatial", "gridExtra")
-install.packages(pkgs)
-
-# Agromet
-remotes::instal_github("AgRoMeteorologiaINTA/agromet")
+# install.packages("pacman") # En el caso que no lo tengan instalado
+pacman::p_install_gh("AgRoMeteorologiaINTA/agromet")
+pacman::p_load(
+  tidyverse, gridExtra, patchwork,   # manejo de datos y ploteo
+  sp, sf,                            # clases objetos espaciales
+  ggspatial, tmap, leaflet, mapview, # para visualizar 
+  agromet                            # datos de INTA
+)
 ```
 
 O, probar el codigo siguiendo este r # embed_file("intro-to-mlr-notebook.Rmd", text = "R-notebook") `r fontawesome::fa("download")`
@@ -210,7 +216,6 @@ render_graph(grafico1)
 Proveedor de las clases `Spatial*` y `Spatial*DataFrame` y sus métodos
 
 ```{r}
-library(sp)
 data("meuse")
 coordinates(meuse) <- ~x+y
 proj4string(meuse) <- CRS("+init=epsg:28992")
@@ -398,7 +403,6 @@ name: estatico-interact
 ## Mapas estáticos vs interactivos
 
 ```{r, echo = F}
-library(tmap)
 data("World")
 mapamundi <- tm_shape(World) + tm_polygons("continent") 
 ```
@@ -488,8 +492,6 @@ template: spplot
 Preparando unos datos para probar...
 
 ```{r}
-library(sp)
-
 # Datos punto
 data("meuse")
 coordinates(meuse) <- ~x+y
@@ -642,10 +644,9 @@ p2
 ---
 template: spplot
 
-Combinando graficos con `gridExtra`
+Combinando graficos con `gridExtra::grid.arrange()`
 
 ```{r sp6, fig.width=12, fig.height  =5, fig.retina=2}
-library(gridExtra)
 grid.arrange(p1, p2, ncol = 2)
 ```
 
@@ -668,7 +669,6 @@ template: sfplot
 
 
 ```{r sf1, eval = F}
-library(sf)
 meuse_sf <- st_as_sf(meuse)
 plot(meuse_sf)
 ```
@@ -702,9 +702,6 @@ template: ggsf
 
 
 ```{r ggsf1, eval = F}
-library(sf)
-library(ggplot2)
-meuse_sf <- st_as_sf(meuse)
 ggplot(meuse_sf) +
   aes(color = zinc) +
   geom_sf() +            #<<
@@ -735,7 +732,6 @@ template: ggsf
 - `ggspatial` permite agregar mapa base, escalas, etc.
 
 ```{r ggsf2, eval = F}
-library(ggspatial)
 ggplot(meuse_sf) +
   annotation_map_tile("osm", zoomin = 0) +  #<<
   aes(color = zinc) +
@@ -761,7 +757,6 @@ template: ggsf
 Podemos usar facets
 
 ```{r ggsf3, eval = F}
-library(dplyr)
 meuse_sf |> 
   pivot_longer(cadmium:zinc) |> 
   ggplot() +
@@ -788,6 +783,7 @@ template: ggsf
 O `patchwork` para tener una escala por panel...
 
 ```{r ggsf4, eval = F}
+# Graficos individuales
 p_base <- ggplot(meuse_sf) +
   annotation_map_tile("osm", zoomin = 0) +  #<<
   geom_sf() + theme_bw()
@@ -796,7 +792,7 @@ p_lead <- p_base +aes(color = lead)
 p_cadmium <- p_base + aes(color = cadmium) 
 p_copper <- p_base + aes(color = copper)
 
-library(patchwork)
+# Composición
 (p_zinc + p_cadmium) /(p_copper + p_lead)
 ```
 
@@ -831,8 +827,6 @@ template: tmap
 
 
 ```{r tm1, eval = F}
-library(tmap)
-library(agromet)
 tmap_mode("plot") # modo estático, "view" para dinámico
 
 # Poligonos usando Agromet
@@ -1099,7 +1093,6 @@ template: mpvw
 - Ideal para explorar!
 
 ```{r mv1, eval = F}
-library(mapview)
 mapview(meuse_sf, zcol = "zinc")
 ```
 
@@ -1158,7 +1151,6 @@ template: leaflet
 - Sintaxis un poco más compleja, control mas fino
 
 ```{r lf1, eval = F}
-library(leaflet)
 leaflet(estaciones) |>  
   addCircles() 
 ```
@@ -1190,7 +1182,6 @@ Podemos agregar capas con `add*()`
 - `addPopups()/addLabels()` etiquetas o callouts
 
 ```{r lf2, eval = F}
-library(leaflet)
 leaflet() |>  
   addProviderTiles(provider = "Esri.WorldImagery") |> 
   addCircles(data = estaciones) |> 
@@ -1250,11 +1241,11 @@ leaflet(estaciones) |>
 
 - Un mapa es la visualizacion por defecto de datos espaciales.
 
-- En **R** podemos hacer mapas de manera reproducible
+- En **R** podemos hacer mapas completos de manera reproducible
 
 - El ecosistema de librerías está cambiando rápido.
 
-- 
+- Cada vez más flexibilidad para visualizar datos espaciales. 
 
 ---
 class: center, middle

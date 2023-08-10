@@ -1,0 +1,411 @@
+---
+title: "Haciendo mapas con R"
+subtitle: "Por fin viRnes - 11/8"
+author: "Dr. Agustín Alesso"
+format: html
+execute:
+  warnings: false
+---
+
+## Paquetes
+
+Estos son los paquetes que se van a usar
+
+```{r setup, include=FALSE}
+# install.packages("pacman") # En el caso que no lo tengan instalado
+pacman::p_install_gh("AgRoMeteorologiaINTA/agromet")
+pacman::p_load(
+  tidyverse, gridExtra, patchwork,   # manejo de datos y ploteo
+  sp, sf,                            # clases objetos espaciales
+  ggspatial, tmap, leaflet, mapview, # para visualizar 
+  agromet                            # datos de INTA
+)
+```
+
+## `sp`
+
+- `sp::plot()` usa plot base para objetos espaciales
+
+- `sp::spplot()` usa el paquete `grid` (similar a `lattice`) 
+
+- Soportan vectores y raster como objetos `Spatial*`
+
+- Son rápidos
+
+- Sintaxis compleja
+
+- `sp::spplot()` gráficos multipanel
+
+Preparando unos datos para probar...
+
+```{r}
+# Datos punto
+data("meuse")
+coordinates(meuse) <- ~x+y
+proj4string(meuse) <- CRS("+init=epsg:28992")
+
+# Datos raster
+data("meuse.grid")
+coordinates(meuse.grid) = ~x+y
+proj4string(meuse.grid) <- CRS("+init=epsg:28992")
+gridded(meuse.grid) = TRUE
+```
+
+Algo básico con `sp::plot()`...
+
+```{r, out.width="80%"}
+labs <- cut(meuse$zinc, 5) |> unique()
+cols <- palette.colors(nlevels(labs))
+plot(meuse, axes = T, col = cols, pch = 1)
+legend("topleft", legend = labs, pch = 1, col = cols)
+```
+
+Lo mismo con `sp::spplot()`...
+
+```{r, out.width="80%"}
+spplot(meuse, zcol = "zinc", scales= list(draw =T))
+```
+
+Algo mejor...
+
+```{r sp2}
+spplot(
+  meuse, zcol = "zinc",
+  scales = list(draw = T),      
+  cuts = seq(0,2000, by = 250), 
+  key.space = "right",           
+  ylab = "Northing (m)",        
+  xlab = "Easting (m)"      
+)
+```
+
+Más de una variable...
+
+```{r sp3}
+spplot(
+  meuse, zcol = c("zinc", "lead"), 
+  scales = list(draw = T), 
+  ylab = "Northing (m)", 
+  xlab = "Easting (m)",
+  key.space = "bottom"
+)
+```
+
+Ploteando rasters
+
+```{r sp4}
+p1 <- spplot(
+  meuse.grid, zcol= "dist",
+  scales = list(draw = T), 
+  ylab = "Northing (m)", 
+  xlab = "Easting (m)",
+  at = seq(0, 1, by = 0.05) 
+)
+p1
+```
+
+```{r sp5}
+p2 <- spplot(
+  meuse.grid, zcol= "ffreq",
+  scales = list(draw = T), 
+  ylab = "Northing (m)",
+  xlab = "Easting (m)"
+)
+p2
+```
+
+Combinando graficos con `gridExtra`
+
+```{r sp6, fig.width=12, fig.height  =5, fig.retina=2}
+grid.arrange(p1, p2, ncol = 2)
+```
+
+## `sf::plot()`
+
+- Sólo para vectores (puntos, lineas, poligonos, etc)
+
+- Muy rápido, ideal para explorar
+
+- Sintaxis similar a `base::plot()`, se agregan elementos....
+
+```{r sf1}
+meuse_sf <- st_as_sf(meuse)
+plot(meuse_sf)
+```
+
+## `ggplot2` + `sf` + `ggspatial`
+
+- Vectores (puntos, lineas, poligonos) y rasters
+
+- Sigue la lógica de _grammar of graphics_ 
+
+- `geom_sf()`/`coords_sf()`
+
+```{r ggsf1}
+meuse_sf <- st_as_sf(meuse)
+ggplot(meuse_sf) +
+  aes(color = zinc) +
+  geom_sf() +            
+  coord_sf(datum = NULL) 
+```
+
+- `ggspatial` permite agregar mapa base, escalas, etc.
+
+```{r ggsf2}
+ggplot(meuse_sf) +
+  annotation_map_tile("osm", zoomin = 0) +  
+  aes(color = zinc) +
+  geom_sf() +
+  coord_sf()   
+```
+
+Podemos usar facets
+
+```{r ggsf3}
+meuse_sf |> 
+  pivot_longer(cadmium:zinc) |> 
+  ggplot() +
+  annotation_map_tile("osm", zoomin = 0) +  
+  aes(color = value) +
+  geom_sf() +
+  facet_wrap(~ name)
+```
+
+O `patchwork` para tener una escala por panel...
+
+```{r ggsf4}
+# Mapas individuales
+p_base <- ggplot(meuse_sf) +
+  annotation_map_tile("osm", zoomin = 0) +  
+  geom_sf() + theme_bw()
+p_zinc <- p_base + aes(color = zinc) 
+p_lead <- p_base +aes(color = lead)
+p_cadmium <- p_base + aes(color = cadmium) 
+p_copper <- p_base + aes(color = copper)
+
+# Composicion
+(p_zinc + p_cadmium) /(p_copper + p_lead)
+```
+
+## `tmap`
+
+- Vectores (puntos, lineas, poligonos) y rasters
+
+- Sigue la lógica de _grammar of graphics_ 
+
+- Mapas estáticos y dinámicos (leaflet)
+
+- `tm_shape()` es la base que define el set de datos, luego `+ tm_*` agregan capas 
+
+- El orden de los factorers altera el producto
+
+
+```{r tm1}
+tmap_mode("plot") # modo estático, "view" para dinámico
+
+# Poligonos usando Agromet
+provs <- mapa_provincias()
+dptos <- mapa_departamentos()
+
+mapa_base <- tm_shape(provs) +
+  tm_borders()
+mapa_base
+```
+
+Agregando los estaciones con `tm_dots()`
+
+```{r tm2}
+estaciones <- metadatos_nh() |>
+  st_as_sf(coords = c("lon", "lat")) |> 
+  st_set_crs(4326)
+colores <- c(INTA = "blue", SMN = "red")
+
+mapa_est_org <- tm_shape(estaciones) +
+  tm_dots("organismo", palette = colores) +
+  tm_layout(legend.outside = T)
+
+mapa_base + mapa_est_org
+```
+
+Un ejemplo con escala numérica...
+
+```{r tm3}
+mapa_est_alt <- tm_shape(estaciones) +
+  tm_bubbles("altura") +
+  tm_layout(legend.outside = T)
+
+mapa_base + mapa_est_alt
+```
+
+Y ambas a la vez?...
+
+```{r tm4}
+mapa_est_alt_org <- tm_shape(estaciones) +
+  tm_bubbles("altura", col = "organismo",
+             palette = colores) +
+  tm_layout(legend.outside = T)
+
+mapa_base + mapa_est_alt_org
+```
+
+Podemos usar facets... 
+
+```{r tm5}
+provincias <- c("Buenos Aires", "Santa Fe", "Córdoba")
+
+provs |> filter(name %in% provincias) |> 
+  tm_shape() +
+  tm_borders() +
+  tm_facets("name") + 
+estaciones |> filter(provincia %in% provincias) |> 
+  tm_shape() +
+  tm_dots("organismo", size = 0.25, palette = colores) +
+  tm_facets("provincia", ncol = 1) 
+```
+
+Para agregar elementos adicionales
+
+- `tm_graticule()` para grilla coordenadas, permite reproyectar
+
+- `tm_compass()` para rosa
+
+- `tm_scalebar()` para escala
+
+- `tm_layout()` títulos, etc.
+
+```{r tm6}
+mapa_base + 
+  mapa_est_org +
+  tm_graticules() +
+  tm_compass(
+    type = "arrow", size = 2, 
+    position = c("left","top")
+  ) +
+  tm_scale_bar() +
+  tm_layout(
+    main.title = "Estaciones NH", 
+    main.title.size = 1
+  )
+```
+
+También podemos hacer mapas dentro de mapas usando `grid::viewport()`
+
+```{r tm7}
+# Mapa principal
+mapa_bsas <- provs |> filter(name == "Buenos Aires") |> 
+  tm_shape() +
+  tm_borders() +
+  estaciones |> filter(provincia == "Buenos Aires") |> 
+  tm_shape() +
+  tm_dots("organismo", size = 0.05, palette = colores) +
+  tm_text("estacion", size = 0.75, ymod = 0.5, remove.overlap = T) + 
+  tm_layout(frame = F)
+
+# Minimapa
+provs <- provs |> mutate(foco = ifelse(name == "Buenos Aires", "gray", "white"))
+mapa_arg <- tm_shape(provs) +
+  tm_polygons("foco")
+
+# Imprimir mapa principal y submapa
+mapa_bsas 
+vp <- grid::viewport(x = 0.9, y = 0.2, width = 0.3, height = 0.3) 
+print(mapa_arg, vp = vp) 
+```
+
+Podemos alternar entre mapas estáticos/dinámicos definiendo el modo `tmap_mode( mode = c("plot", "view"))` y usar `tm_view()` para controlar argumentos de `leaflet`
+
+```{r tm8}
+tmap_mode("view")
+mapa_est_org + 
+  tm_view(
+    view.legend.position = c("right", "bottom"),
+    set.view = 4             # mas grande mas zoom
+  ) # mas grande mas zoom
+# tmap_mode("plot") # para volver 
+```
+
+## `mapview`
+
+- Vectores (puntos, líneas, polígonos) y rasters, spacetime
+
+- Sólo mapas interactivos
+
+- Sintaxis super simple, parecida a spplot
+
+- Controles automaticos (activar/desactivar capas, mapa base, zoom, atributos)
+
+- Ideal para explorar!
+
+```{r mv1}
+mapview(meuse_sf, zcol = "zinc")
+```
+
+- Se pueden poner varias capas a la vez
+
+- Controla opacidad, mapa base, etc.
+
+```{r mv2}
+mapviewOptions(basemaps = "Esri.WorldImagery")
+pts <- mapview(meuse_sf, zcol = c("zinc", "lead"))
+rst <- mapview(meuse.grid, zcol = c("dist"), alpha = 0.5)
+rst + pts  
+```
+
+## `leaflet`
+
+- Vectores (puntos, lineas, poligonos) `sp` o `sf`
+
+- Sigue la lógica de _grammar of graphics_ (capas) 
+
+- Sólo graficos dinámicos, pensado para webs.
+
+- Sintaxis un poco más compleja, control mas fino
+
+```{r lf1}
+leaflet(estaciones) |>  
+  addCircles() 
+```
+
+Podemos agregar capas con `add*()`
+
+- `add*Tiles()` para mapas base provedores y servidores WMS 
+
+- `add*Markers()` para puntos de ubicacion (etiquetas, simbolos, círculos)
+
+- `addPolygons()/addPolylines()` para capas de polígonos y lineas
+
+- `addCircles()/addRectangles()` geometrias
+
+- `addPopups()/addLabels()` etiquetas o callouts
+
+```{r lf2}
+leaflet() |>  
+  addProviderTiles(provider = "Esri.WorldImagery") |> 
+  addCircles(data = estaciones) |> 
+  addMarkers(lat = -31.440157, lng = -60.940639, popup = "Acá estoy") |>
+  addPolygons(data = provs, fill = NA, color = "white", weight =  0.5) 
+```
+
+- Los marcadores se pueden agrupar según el zoom, 
+
+- Los elementos se pueden mapear atributos a color, forma, etc. usando paletas: `color*()`,     
+
+```{r lf3}
+# definir paleta
+pal <- colorFactor(c("red", "blue"), domain = c("INTA", "SMN"))
+
+# Mapa
+leaflet(estaciones) |>  
+  addProviderTiles(provider = "Esri.WorldImagery") |> 
+  addCircleMarkers(
+    data = estaciones, 
+    fillColor = ~ pal(organismo),
+    color = "transparent",
+    fillOpacity = 1,
+    clusterOptions = markerClusterOptions() # <<
+  ) |> # <<
+  addMarkers(lat = -31.440157, lng = -60.940639, popup = "Acá estoy") |>
+  addPolygons(data = provs, fill = NA, color = "white", weight =  0.5) |> 
+  addLegend(data = estaciones, "bottomright", pal = pal, values = ~ organismo)
+```
+
