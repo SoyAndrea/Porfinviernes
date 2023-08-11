@@ -16,15 +16,16 @@ output:
 editor_options: 
   chunk_output_type: inline
 ---
+
 class: title-slide, middle, hide-count
 
 ```{r setup, include=FALSE}
 #Packages
+#pacman::p_install_gh("AgRoMeteorologiaINTA/agromet")
 pacman::p_load(
   knitr, tidyverse, patchwork, xfun, DiagrammeR, ggvenn, gridExtra,
-  tmap, leaflet, sp, sf, mapview
+  tmap, leaflet, sp, sf, mapview, ggspatial, agromet
 )
-pacman::p_install_gh("AgRoMeteorologiaINTA/agromet")
 
 xaringanExtra::use_tile_view()
 # xaringanExtra::use_clipboard()
@@ -68,22 +69,14 @@ source(here::here("./mapas_con_R/out_lines.R"))
 ---
 ## Outline
 
-.pull-left[
-
 -   ¿Por qué hacer mapas? ¿por qué con R?
 -   Evolución datos espaciales en R
 -   Mapas estáticos vs interactivos
 -   Paquetes para mapear
 
-]
-
-???
-
 --
 
-.pull-right[
-
-<br><br><br><br><br>
+<br>
 
 .small[
 
@@ -100,12 +93,9 @@ pacman::p_load(
 )
 ```
 
-O, probar el codigo siguiendo este r # embed_file("intro-to-mlr-notebook.Rmd", text = "R-notebook") `r fontawesome::fa("download")`
+O, probar el código siguiendo este `r embed_file("./mapas_con_R/mapas_con_R_nb.qmd", text = "R-notebook")` `r fontawesome::fa("download")`
 
 ]
-
-]
-
 
 ---
 name: why
@@ -125,7 +115,9 @@ include_graphics("https://upload.wikimedia.org/wikipedia/commons/c/c7/Snow-chole
 
 ???
 
-Maps have been used for several thousand years for a wide variety of purposes. Historic examples include maps of buildings and land ownership in the Old Babylonian dynasty more than 3000 years ago and Ptolemy’s world map in his masterpiece Geography nearly 2000 years ago
+Maps have been used for several thousand years for a wide variety of purposes. 
+
+Historic examples include maps of buildings and land ownership in the Old Babylonian dynasty more than 3000 years ago and Ptolemy’s world map in his masterpiece Geography nearly 2000 years ago
 
 En uno de los primeros análisis de datos espaciales el Dr. Snow mapeó los casos de cólera en el barrio Soho de Londres y la disposición de las estaciones de bombeo.
 
@@ -138,7 +130,7 @@ De la visualización de ambas capas de información descubró que el pozo contam
 
 - Ideal para visualizar, explorar o analizar datos espaciales 
 
-- Permiten ver tendencias, patrones, detectar anomalías, outliers, etc
+- Permiten ver tendencias, patrones, detectar anomalías, outliers, etc.
 
 - Modo efectivo para comunicar resultados de análisis de datos espaciales
 
@@ -183,7 +175,25 @@ Ejemplo de tendencia
 Ejemplo clásico pozos y colera
 
 ---
+background-image: url(https://camo.githubusercontent.com/63d5460e5fdfb78d42eedeaa54c14b63fcb7c872ac85e8c49fd1fd827553e9be/68747470733a2f2f6d74656e6e656b65732e6769746875622e696f2f646f776e6c6f6164732f696d616765732f636c61737369632e706e67)
+background-size: contain
+background-position: center
+
+---
+background-image: url(https://camo.githubusercontent.com/4fccc53ab6c73754e5cc8649fd89508e7033c6a5f1a239e524e8451fde6cbc05/68747470733a2f2f6d74656e6e656b65732e6769746875622e696f2f646f776e6c6f6164732f696d616765732f555363686f726f2e706e67)
+background-size: contain
+background-position: center
+
+---
+background-image: url(https://camo.githubusercontent.com/8143ec3e62de5d7e8b6fb9483a3e281e3c2a790f209e26bc12ba4668ccf7fb4a/68747470733a2f2f6d74656e6e656b65732e6769746875622e696f2f646f776e6c6f6164732f696d616765732f776f726c645f666163657473322e706e67)
+background-size: contain
+background-position: center
+
+---
 name: spatial
+background-image: url(https://r-spatial.org/images/logo.png)
+background-position: 95% 5%
+background-size: 10%
 
 ## Datos espaciales en R: evolución 
 
@@ -222,7 +232,7 @@ proj4string(meuse) <- CRS("+init=epsg:28992")
 meuse
 ```
 
-Slots para: `bbox`, `coords`, `proj4string` y `data` (los que `*DataFrame`
+Slots para: `bbox`, `coords`, `proj4string` y `data` (los que terminan en `DataFrame`)
 
 ]
 
@@ -269,7 +279,7 @@ render_graph(grafico3)
 
 .pull-right[
 
-- `maptools` daba utilidades varias para manejar vectores 
+- `maptools` da utilidades varias para manejar vectores 
 
 - `rgdal` para leer/guardar datos espaciales
 
@@ -296,7 +306,7 @@ render_graph(grafico4)
 
 .pull-right[
 
-- `maptools` daba utilidades varias para manejar vectores 
+- `maptools` da utilidades varias para manejar vectores 
 
 - `rgdal` para leer/guardar datos espaciales
 
@@ -304,7 +314,7 @@ render_graph(grafico4)
 
 - `raster` para operar rasters
 
-- `spacetime` aporta clases y metodos para datos espacio-temporales
+- `spacetime` aporta clases y métodos para datos espacio-temporales
 
 ]
 
@@ -348,8 +358,6 @@ grafico6 <- grafico5 |>
   add_edge(from = 6, to = 8) |> 
   add_edge(from = 7, to = 8) |> 
   add_global_graph_attrs(attr = "rank", value = "same; 5;8;", attr_type = "graph")
-
-  
 render_graph(grafico6)
 ```
 
@@ -429,18 +437,17 @@ mapamundi
 
 .pull-left[
 
-Se pueden hacer "mapas" usando funciones básicas (y mucho código) o como paquetes dedicados
+Se pueden hacer "mapas" usando funciones básicas (y muuuucho código) 
 
-Algunos paquetes con capacidades para mapear:
+o bien con paquetes dedicados:
 
 - `sp` a través de `spplot()`
 - `sf` usando `plot()`
 - `raster`
-- `ggplot2`, marida con `sf` usando `geom_sf()`
-- `ggspatial`
-- `tmap`, muy completo
-- `mapview`,  
-- `leaflet`,
+- `ggplot2` usando `geom_sf()` (+ `ggspatial`)
+- `tmap` 
+- `mapview`  
+- `leaflet`
 - `rbokeh`, un port the paquete `bokeh` de Python
 - ...
 
@@ -451,11 +458,11 @@ Algunos paquetes con capacidades para mapear:
 .pull-right[
 
 ```{r, echo = F, include=T}
-estaticos <- c("sp", "sf", "raster", "ggplot2", "ggspatial", "tmap")
+estáticos <- c("sp", "sf", "raster", "ggplot2", "ggspatial", "tmap")
 interactivos <- c("tmap", "leaflet", "mapview", "rbokeh")
 
 # Chart
-x <- list(interactivos = interactivos, estaticos = estaticos)
+x <- list(interactivos = interactivos, estáticos = estáticos)
 ggvenn(x, show_elements = T, label_sep = "\n", text_size= 6)
 ```
 
@@ -477,9 +484,9 @@ template: spplot
 
 - Soportan vectores y raster como objetos `Spatial*`
 
-- Son rápidos
+- Son rápidos para explorar 
 
-- Sintaxis compleja
+- Sintaxis compleja para composiciones avanzadas
 
 - `sp::spplot()` gráficos multipanel
 
@@ -620,7 +627,6 @@ template: spplot
 
 Ploteando rasters
 
-
 ```{r sp5, eval = F}
 p2 <- spplot(
   meuse.grid, zcol= "ffreq",
@@ -644,7 +650,7 @@ p2
 ---
 template: spplot
 
-Combinando graficos con `gridExtra::grid.arrange()`
+Combinando gráficos con `gridExtra::grid.arrange()`
 
 ```{r sp6, fig.width=12, fig.height  =5, fig.retina=2}
 grid.arrange(p1, p2, ncol = 2)
@@ -652,6 +658,10 @@ grid.arrange(p1, p2, ncol = 2)
 
 ---
 name: sfplot
+background-image: url(https://user-images.githubusercontent.com/520851/34887433-ce1d130e-f7c6-11e7-83fc-d60ad4fae6bd.gif)
+background-position: 95% 5%
+background-size: 7%
+
 
 ## `sf::plot()`
 
@@ -665,7 +675,7 @@ template: sfplot
 
 - Muy rápido, ideal para explorar
 
-- Sintaxis similar a `base::plot()`, se agregan elementos....
+- Sintaxis similar a `base::plot()`, los elementos se agrega...
 
 
 ```{r sf1, eval = F}
@@ -684,6 +694,10 @@ plot(meuse_sf)
 
 ---
 name: ggsf
+background-image: url(https://raw.githubusercontent.com/rstudio/hex-stickers/master/PNG/ggplot2.png)
+background-position: 95% 5% 
+background-size: 5%
+
 
 ## `ggplot2` + `sf` + `ggspatial`
 
@@ -692,7 +706,7 @@ template: ggsf
 
 .pull-left[
 
-- Vectores (puntos, lineas, poligonos) y rasters
+- Vectores (puntos, líneas, polígonos) y rasters
 
 - Sigue la lógica de _grammar of graphics_ 
 
@@ -815,11 +829,11 @@ template: tmap
 
 .pull-left[
 
-- Vectores (puntos, lineas, poligonos) y rasters
+- Vectores (puntos, líneas, polígonos) y rasters
 
 - Sigue la lógica de _grammar of graphics_ 
 
-- Mapas estáticos y dinámicos (leaflet)
+- Mapas estáticos y dinámicos (via `leaflet`)
 
 - `tm_shape()` es la base que define el set de datos, luego `+ tm_*` agregan capas 
 
@@ -966,7 +980,7 @@ Para agregar elementos adicionales
 
 - `tm_graticule()` para grilla coordenadas, permite reproyectar
 
-- `tm_compass()` para rosa
+- `tm_compass()` para rosa de los vientos
 
 - `tm_scalebar()` para escala
 
@@ -1044,10 +1058,7 @@ template: tmap
 .pull-left[
 
 Podemos alternar entre mapas estáticos/dinámicos definiendo el modo
-
-`tmap_mode( mode = c("plot", "view"))`
-
-y usar `tm_view()` para controlar argumentos de `leaflet`
+`plot` o `view` y usar `tm_view()` para controlar argumentos de `leaflet`
 
 ```{r tm8, eval = F}
 tmap_mode("view")
@@ -1074,6 +1085,9 @@ mapa_est_org +
 
 ---
 name: mpvw
+background-image: url(https://github.com/tim-salabim/mvl/blob/cstriestohelp/imagery/animated/box_anim.gif?raw=true)
+background-position: 95% 5%
+background-size: 10%
 
 ## `mapview`
 
@@ -1134,6 +1148,9 @@ rst + pts
 
 ---
 name: leaflet
+background-image: url(https://leafletjs.com/docs/images/logo.png)
+background-position: 95% 10%
+background-size: 10%
 
 ## `leaflet`
 
@@ -1241,11 +1258,19 @@ leaflet(estaciones) |>
 
 - Un mapa es la visualizacion por defecto de datos espaciales.
 
+--
+
 - En **R** podemos hacer mapas completos de manera reproducible
 
-- El ecosistema de librerías está cambiando rápido.
+--
+
+- El ecosistema de librerías está cambiando, y rápido.
+
+--
 
 - Cada vez más flexibilidad para visualizar datos espaciales. 
+
+--
 
 ---
 class: center, middle
